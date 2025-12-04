@@ -39,4 +39,4 @@ jobs:
       - name: Report coverage to OctoCov
         uses: k1LoW/octocov-action@v1
         with:
-          path: ${{ env.DIRECTORY }}/coverage.xml
+          workdir: ${{ env.DIRECTORY }}
