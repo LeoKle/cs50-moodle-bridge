@@ -36,4 +36,9 @@ jobs:
           directory: ${{ env.DIRECTORY }}
           test_type: ${{ matrix.test_types }}
 
-      - uses: k1LoW/octocov-action@v1
+      - name: Report coverage to OctoCov
+        uses: k1LoW/octocov-action@v1
+        with:
+          coverage_file: |
+            backend/coverage.xml
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
