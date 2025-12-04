@@ -2,8 +2,14 @@ name: Backend Tests
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/**'
   pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/**'
 
 env:
   DIRECTORY: backend
