@@ -1,0 +1,46 @@
+name: Backend Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/**'
+  pull_request:
+    paths:
+      - 'backend/**'
+      - '.github/**'
+
+env:
+  DIRECTORY: backend
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup backend
+        uses: ./.github/actions/setup
+        with:
+          directory: ${{ env.DIRECTORY }}
+
+      - name: Run unit tests
+        uses: ./.github/actions/pytest
+        with:
+          directory: ${{ env.DIRECTORY }}
+          test_type: unit
+
+      - name: Run integration tests
+        uses: ./.github/actions/pytest
+        with:
+          directory: ${{ env.DIRECTORY }}
+          test_type: integration
+
+      - name: Report coverage to OctoCov
+        uses: k1LoW/octocov-action@v1
+        with:
+          work-dir: ${{ env.DIRECTORY }}
+        continue-on-error: true
