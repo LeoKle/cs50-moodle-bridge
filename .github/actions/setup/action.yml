@@ -21,4 +21,4 @@ runs:
         
     - name: Install the project
       shell: bash
-      run: uv sync --all-extras --dev
+      run: cd ${{ inputs.directory }} && uv sync --all-extras --dev
