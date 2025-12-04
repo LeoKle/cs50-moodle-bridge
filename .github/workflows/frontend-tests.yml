@@ -43,4 +43,4 @@ jobs:
         uses: k1LoW/octocov-action@v1
         with:
           work-dir: ${{ env.DIRECTORY }}
-          if-no-coverage: skip
+        continue-on-error: true
