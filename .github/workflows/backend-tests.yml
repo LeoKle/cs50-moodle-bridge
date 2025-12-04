@@ -17,9 +17,6 @@ env:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        test_types: [unit, integration]
 
     steps:
       - name: Check out repository
@@ -30,11 +27,17 @@ jobs:
         with:
           directory: ${{ env.DIRECTORY }}
 
-      - name: Run ${{ matrix.test_types }} tests
+      - name: Run unit tests
         uses: ./.github/actions/pytest
         with:
           directory: ${{ env.DIRECTORY }}
-          test_type: ${{ matrix.test_types }}
+          test_type: unit
+
+      - name: Run integration tests
+        uses: ./.github/actions/pytest
+        with:
+          directory: ${{ env.DIRECTORY }}
+          test_type: integration
 
       - name: Report coverage to OctoCov
         uses: k1LoW/octocov-action@v1
