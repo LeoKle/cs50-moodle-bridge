@@ -30,9 +30,8 @@ jobs:
         with:
           directory: ${{ env.DIRECTORY }}
 
-      - name: Run unit tests
-        working-directory: ${{ env.DIRECTORY }}
-        shell: bash
-        run: |
-          echo "Running ${{matrix.test_types}} tests..."
-          uv run pytest -m ${{matrix.test_types}} --maxfail=1 --disable-warnings
+      - name: Run ${{ matrix.test_types }} tests
+        uses: ./.github/actions/pytest
+        with:
+          directory: ${{ env.DIRECTORY }}
+          test_type: ${{ matrix.test_types }}
