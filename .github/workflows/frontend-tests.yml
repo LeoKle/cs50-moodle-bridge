@@ -1,0 +1,38 @@
+name: Frontend Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - '.github/**'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/**'
+
+env:
+  DIRECTORY: frontend
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test_types: [unit, integration]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup frontend
+        uses: ./.github/actions/setup
+        with:
+          directory: ${{ env.DIRECTORY }}
+
+      - name: Run unit tests
+        working-directory: ${{ env.DIRECTORY }}
+        shell: bash
+        run: |
+          echo "Running ${{matrix.test_types}} tests..."
+          uv run pytest -m ${{matrix.test_types}} --maxfail=1 --disable-warnings
