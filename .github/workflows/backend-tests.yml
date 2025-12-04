@@ -39,6 +39,4 @@ jobs:
       - name: Report coverage to OctoCov
         uses: k1LoW/octocov-action@v1
         with:
-          coverage_file: |
-            backend/coverage.xml
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ env.DIRECTORY }}/coverage.xml
