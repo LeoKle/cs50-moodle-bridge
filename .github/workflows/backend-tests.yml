@@ -39,4 +39,5 @@ jobs:
       - name: Report coverage to OctoCov
         uses: k1LoW/octocov-action@v1
         with:
-          workdir: ${{ env.DIRECTORY }}
+          work-dir: ${{ env.DIRECTORY }}
+          config: ../.octocov.yml
