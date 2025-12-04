@@ -35,3 +35,5 @@ jobs:
         with:
           directory: ${{ env.DIRECTORY }}
           test_type: ${{ matrix.test_types }}
+
+      - uses: k1LoW/octocov-action@v1
