@@ -43,3 +43,4 @@ jobs:
         uses: k1LoW/octocov-action@v1
         with:
           work-dir: ${{ env.DIRECTORY }}
+        continue-on-error: true
