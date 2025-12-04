@@ -1,7 +1,7 @@
 coverage:
   if: true
   paths:
-    - cov.xml
+    - coverage.xml
 testExecutionTime:
   if: true
 diff:
