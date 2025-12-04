@@ -1,5 +1,7 @@
+from add import add
+
 from ._marker import pytestmark  # noqa: F401
 
 
 def test_add():
-    assert 3 == 3
+    assert add(1, 2) == 3
