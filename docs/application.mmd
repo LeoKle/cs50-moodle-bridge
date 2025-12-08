@@ -1,0 +1,26 @@
+classDiagram
+    class GradingStrategyInterface
+    <<interface>> GradingStrategyInterface
+    class GradingStrategyInterface {
+        +grade()
+    }
+
+    GradingStrategyInterface <|.. GithubNameAssignment
+    class GithubNameAssignment {
+        +grade()
+    }
+
+    GradingStrategyInterface <|.. CS50Assignment
+    class CS50Assignment {
+        +grade()
+    }
+
+    GradingStrategyInterface <|.. MathworksProgressReportAssignment
+    class MathworksProgressReportAssignment {
+        +grade()
+    }
+
+    GradingStrategyInterface <|.. MathworksGraderAssignment
+    class MathworksGraderAssignment {
+        +grade()
+    }
