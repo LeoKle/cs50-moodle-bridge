@@ -1,0 +1,62 @@
+erDiagram
+    USER {
+        string email PK
+        int github_id UK
+        string name
+        string github_username
+        list[int] courses
+    }
+
+    USER 1 to many(0) SUBMISSION_MODEL : "has (github_id)"
+    USER 1 to many(0) MOODLE_WORKSHEET_CSV : "contains (email)"
+    USER many(1) to many(1) COURSE : "is in (cs50_id)"
+
+    %% COURSE_ID
+    %% COURSE_ID 1 to 1 COURSE : "has"
+    %% USER many(1) to many(1) COURSE_ID : "has"
+
+    CS50_SUBMISSIONS {
+        string slug
+        int belongs_to_cs50_course_id
+        list[SubmissionModel] submissions
+    }
+
+    CS50_SUBMISSIONS 1 to zero or more SUBMISSION_MODEL : has
+
+    SUBMISSION_MODEL {
+        string archive
+        int checks_passed
+        int checks_run
+        int github_id
+        string github_url
+        string github_username
+        Optional[string] name
+        string slug
+        int style50_score
+        date timestamp
+    }
+
+    MOODLE_WORKSHEET_CSV {
+        string submission_id
+        string full_name
+        string email
+        string status
+        Optional[date] submission_beginn
+        Optional[date] deadline
+        Optional[date] last_submission
+        MoodleGrading grade
+        string scale
+        bool grade_can_be_changed
+        date submission_last_modified
+        date grade_last_modified
+        string feedback_comment
+    }
+
+    COURSE {
+        string name
+        int cs50_id
+        list[string] problems
+    }
+
+    COURSE 1 to many(1) CS50_SUBMISSIONS : "has"
+    COURSE 1 to many(0) MOODLE_WORKSHEET_CSV : "has"
