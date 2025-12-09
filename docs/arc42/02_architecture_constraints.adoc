@@ -1,0 +1,48 @@
+ifndef::imagesdir[:imagesdir: ../images]
+
+[[section-architecture-constraints]]
+== Architecture Constraints
+
+ifdef::arc42help[]
+[role="arc42help"]
+****
+.Contents
+Any requirement that constraints software architects in their freedom of design and implementation decisions or decision about the development process. These constraints sometimes go beyond individual systems and are valid for whole organizations and companies.
+
+.Motivation
+Architects should know exactly where they are free in their design decisions and where they must adhere to constraints.
+Constraints must always be dealt with; they may be negotiable, though.
+
+.Form
+Simple tables of constraints with explanations.
+If needed you can subdivide them into
+technical constraints, organizational and political constraints and
+conventions (e.g. programming or versioning guidelines, documentation or naming conventions)
+
+
+.Further Information
+
+See https://docs.arc42.org/section-2/[Architecture Constraints] in the arc42 documentation.
+
+****
+endif::arc42help[]
+
+The system must operate within several technical, organizational, and environmental constraints:
+
+*Technical Constraints*
+
+* The application must support the import and export formats (csv) defined by Moodle and CS50
+* A web-based architecture is required with a separate frontend and backend
+* Student and course data must be stored in a persistent database
+//* The system must run inside the university infrastructure (no external cloud services).
+
+*Organizational Constraints*
+
+* The system is only intended for tutors; students will only see results later in Moodle
+* All data used inside the application is synthetic or anonymized, so no real student data is processed
+* Input file formats cannot be changed; the system must adapt to Moodle/CS50 specifications
+
+*Environmental Constraints*
+
+//* Network access may be limited, so the system primarily works with local file uploads instead of external APIs.
+* The architecture must remain flexible in case Moodle or CS50 modify their export formats
