@@ -4,7 +4,7 @@ from typing import TypeVar
 T = TypeVar("T")
 
 
-class Repository[T](ABC):
+class IRepository[T](ABC):
     """Generic repository interface for CRUD operations."""
 
     @abstractmethod

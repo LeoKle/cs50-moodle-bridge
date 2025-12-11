@@ -1,6 +1,6 @@
 from abc import ABC
 
-from interfaces.repositories import IRepository
+from interfaces.repositories.repository_interface import IRepository
 from models.course import Course
 
 
