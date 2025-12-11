@@ -1,8 +1,6 @@
 """Domain models for data validation and type safety."""
 
-from typing import Any, ClassVar
-
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class Course(BaseModel):
@@ -18,11 +16,9 @@ class Course(BaseModel):
         default_factory=list, description="List of exercise document IDs"
     )
 
-    class Config:
-        """Pydantic model configuration."""
-
-        populate_by_name = True  # Allow both 'id' and '_id'
-        json_schema_extra: ClassVar[dict[str, Any]] = {
+    model_config = ConfigDict(
+        populate_by_name=True,  # Allows both 'id' and '_id'
+        json_schema_extra={
             "example": {
                 "_id": "507f1f77bcf86cd799439011",
                 "name": "Introduction to Computer Science",
@@ -32,4 +28,5 @@ class Course(BaseModel):
                     "507f191e810c19729de860eb",
                 ],
             }
-        }
+        },
+    )
