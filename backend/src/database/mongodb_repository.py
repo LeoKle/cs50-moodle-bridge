@@ -5,7 +5,7 @@ from bson.errors import InvalidId
 from pymongo.database import Database
 from repositories import CourseRepository
 
-from models.models import Course
+from models.course import Course
 
 
 class MongoDBCourseRepository(CourseRepository):

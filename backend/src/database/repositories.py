@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from backend.src.models.models import Course
+from models.course import Course
 
 
 class CourseRepository(ABC):
