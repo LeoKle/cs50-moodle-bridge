@@ -13,7 +13,7 @@ class Course(BaseModel):
 
     id: str | None = Field(default=None, alias="_id", description="MongoDB ObjectId")
     name: str = Field(..., min_length=1, description="Course name")
-    cs50_id: int = Field(..., description="CS50 course identifier")
+    cs50_id: int | None = Field(default=None, description="CS50 course identifier")
     exercise_ids: list[str] = Field(
         default_factory=list, description="List of exercise document IDs"
     )
