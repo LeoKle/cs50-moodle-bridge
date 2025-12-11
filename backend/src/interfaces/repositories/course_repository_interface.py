@@ -1,7 +1,7 @@
 from abc import ABC
 
-from domain.models.course import Course
 from interfaces.repositories import IRepository
+from models.course import Course
 
 
 class ICourseRepository(IRepository[Course], ABC):
