@@ -51,5 +51,8 @@ ignore = ["COM812"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--cov-report=term", "--cov=src"]
-pythonpath = "src"
+pythonpath = ["src", "."]
 markers = ["unit: unit tests", "integration: integration tests"]
+
+[tool.coverage.run]
+omit = ["*/dependency_injector/*"]
