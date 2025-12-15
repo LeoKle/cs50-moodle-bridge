@@ -65,7 +65,6 @@ def update_course(
         )
     # merge fields
     updated_data = data.model_dump(exclude_unset=True, exclude_defaults=True)
-    print(existing_course, updated_data, updated_data.get("name", existing_course.name))
     updated_course = Course(
         id=existing_course.id,
         name=updated_data.get("name", existing_course.name),
