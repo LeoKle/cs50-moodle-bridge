@@ -3,6 +3,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from repositories.mongo.mongo_settings import MongoSettings
+
 
 def find_project_root(marker="pyproject.toml"):
     current = Path(__file__).resolve()
@@ -18,4 +20,13 @@ load_dotenv(ROOT_DIR / ".env")
 
 
 class Settings(BaseSettings):
+    mongo: MongoSettings = MongoSettings()
+
     model_config = SettingsConfigDict()
+
+
+if __name__ == "__main__":
+    settings = Settings()
+
+    print(settings.mongo.uri)
+    print(settings.mongo.database)
