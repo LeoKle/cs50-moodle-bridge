@@ -63,16 +63,14 @@ def update_course(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail=f"Course with id {course_id} not found"
         )
-
     # merge fields
-    updated_data = data.model_dump(exclude_unset=True)
+    updated_data = data.model_dump(exclude_unset=True, exclude_defaults=True)
+    print(existing_course, updated_data, updated_data.get("name", existing_course.name))
     updated_course = Course(
         id=existing_course.id,
         name=updated_data.get("name", existing_course.name),
         cs50_id=updated_data.get("cs50_id", existing_course.cs50_id),
-        exercise_ids=updated_data.get("exercise_ids")
-        if updated_data.get("exercise_ids") is not None
-        else existing_course.exercise_ids,
+        exercise_ids=updated_data.get("exercise_ids", existing_course.exercise_ids),
     )
 
     saved_course = course_service.update_course(course_id, updated_course)
