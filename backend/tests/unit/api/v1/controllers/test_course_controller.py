@@ -34,6 +34,7 @@ def test_create_course(client):
     assert model.name == payload.name
     assert model.cs50_id == payload.cs50_id
     assert model.exercise_ids == payload.exercise_ids
+    assert model.id != ""  # ensure ID is generated
 
 
 def test_update_course(client):
@@ -49,3 +50,8 @@ def test_update_course(client):
 def test_delete_course(client):
     response = client.delete("/api/v1/courses/1")
     assert response.status_code == 200
+
+    courses = client.get("/api/v1/courses")
+    courses = courses.json()
+    ids = {c["id"] for c in courses}
+    assert "1" not in ids

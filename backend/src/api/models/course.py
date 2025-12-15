@@ -24,7 +24,7 @@ class CourseUpdate(BaseModel):
 class CourseOut(BaseModel):
     """Data returned to the client."""
 
-    id: str = Field(..., alias="_id", description="MongoDB ObjectId")
+    id: str = Field(..., description="MongoDB ObjectId")
     name: str
     cs50_id: int | None = None
     exercise_ids: list[str] = []

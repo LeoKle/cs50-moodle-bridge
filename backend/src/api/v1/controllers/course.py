@@ -1,11 +1,12 @@
 from typing import Annotated
 
 from dependency_injector.wiring import Provide, inject
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from api.models.course import CourseCreate, CourseOut, CourseUpdate
 from dependencies import DependencyContainer
 from interfaces.services.course_service import ICourseService
+from models.course import Course
 
 router = APIRouter(prefix="/courses", tags=["courses"])
 
@@ -16,7 +17,13 @@ def get_course(
     course_id: str,
     course_service: Annotated[ICourseService, Depends(Provide(DependencyContainer.course_service))],
 ):
-    return course_service.get_course(course_id)
+    result: Course = course_service.get_course(course_id)
+    if not result:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Course with id {course_id} not found"
+        )
+
+    return CourseOut(**result.model_dump())
 
 
 @router.get("", response_model=list[CourseOut])
@@ -24,7 +31,8 @@ def get_course(
 def get_courses(
     course_service: Annotated[ICourseService, Depends(Provide(DependencyContainer.course_service))],
 ):
-    return course_service.get_courses()
+    results = course_service.get_courses()
+    return [CourseOut(**course.model_dump()) for course in results]
 
 
 @router.post("", response_model=CourseOut)
@@ -33,7 +41,13 @@ def create_course(
     data: CourseCreate,
     course_service: Annotated[ICourseService, Depends(Provide(DependencyContainer.course_service))],
 ):
-    return course_service.create_course(data)
+    course = Course(
+        name=data.name,
+        cs50_id=data.cs50_id,
+        exercise_ids=list(data.exercise_ids) if data.exercise_ids else [],
+    )
+    created_course = course_service.create_course(course)
+    return CourseOut(**created_course.model_dump())
 
 
 @router.patch("/{course_id}", response_model=CourseOut)
@@ -43,7 +57,26 @@ def update_course(
     data: CourseUpdate,
     course_service: Annotated[ICourseService, Depends(Provide(DependencyContainer.course_service))],
 ):
-    return course_service.update_course(course_id, data)
+    # get existing course
+    existing_course = course_service.get_course(course_id)
+    if not existing_course:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Course with id {course_id} not found"
+        )
+
+    # merge fields
+    updated_data = data.model_dump(exclude_unset=True)
+    updated_course = Course(
+        id=existing_course.id,
+        name=updated_data.get("name", existing_course.name),
+        cs50_id=updated_data.get("cs50_id", existing_course.cs50_id),
+        exercise_ids=updated_data.get("exercise_ids")
+        if updated_data.get("exercise_ids") is not None
+        else existing_course.exercise_ids,
+    )
+
+    saved_course = course_service.update_course(course_id, updated_course)
+    return CourseOut(**saved_course.model_dump())
 
 
 @router.delete("/{course_id}")
@@ -52,4 +85,9 @@ def delete_course(
     course_id: str,
     course_service: Annotated[ICourseService, Depends(Provide(DependencyContainer.course_service))],
 ):
-    course_service.delete_course(course_id)
+    deleted = course_service.delete_course(course_id)
+    if not deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail=f"Course with id {course_id} not found"
+        )
+    return
