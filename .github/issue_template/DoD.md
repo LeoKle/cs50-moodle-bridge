@@ -9,73 +9,52 @@ assignees: []
 ## Purpose
 This issue checks whether the application or a feature is **done** and **ready for release**.
 
----
-
 ## Functional Requirements
-- [ ] Courses can be created  
-- [ ] Students can be imported  
-- [ ] CS50 and Moodle data can be uploaded  
-- [ ] Grading is calculated correctly  
-- [ ] Grades can be exported to Moodle  
-- [ ] A grading overview is available  
+- Acceptance criteria are fully implemented  
+- The solution fulfills the intent of the user story  
+- Edge cases and error scenarios are handled  
 
 ---
 
-## Correctness of Grading
-- [ ] Passed and failed assignments match CS50 data  
-- [ ] Percentages are calculated correctly  
-- [ ] No missing grades exist  
+## Quality & Testing
+- Appropriate tests are written (unit, integration, e2e if applicable)  
+- All existing tests pass  
 
 ---
 
-## Error Handling and Validation
-- [ ] Invalid files / file formats are rejected  
-- [ ] Missing data does not crash the system  
-- [ ] Clear error messages are shown to the user  
+## Code Quality
+- Code follows project coding standards and best practices  
+- No critical or high-severity issues from linters or static analysis  
+- Code is readable, maintainable, and documented
 
 ---
 
-## Security
-- [ ] Only authorized users can export grades  
-
----
-
-## Performance
-- [ ] Imports and grading complete in reasonable time  
-- [ ] User interface remains responsive  
-
----
-
-## Usability
-- [ ] Main workflows are intuitive  
-- [ ] Error and success messages are clear  
-- [ ] No manual database interaction is required  
-
----
-
-## Testing
-- [ ] Core functions (grading, import, export) are tested  
-- [ ] All tests pass before release  
-- [ ] No known critical bugs are open  
+## Review & Approval
+- Feedback is addressed or documented  
+- Final approval is given  
 
 ---
 
 ## Documentation
-- [ ] arc42 documentation exists and is understandable  
-- [ ] User workflows are documented  
-- [ ] Guiding coding guidelines exist and are up to date  
-- [ ] Known limitations are listed  
+- Relevant documentation is updated  
+- Technical or API changes are documented (if applicable)  
+
+---
+
+## Delivery
+- Changes are merged into the main branch  
+- Feature is deployable or ready for release  
+- No unresolved blocking bugs remain  
+
+---
+
+## Security & Performance (if applicable)
+- Security considerations are reviewed  
+- Performance impact is assessed and acceptable  
 
 ---
 
 ## Deployment and Build
-- [ ] Application builds without errors  
-- [ ] Configuration is environment-independent  
-- [ ] Deployment steps are documented  
-
----
-
-## Stakeholder Acceptance
-- [ ] Tutor use cases are validated  
-- [ ] Feedback is addressed or documented  
-- [ ] Final approval is given  
+- Application builds without errors  
+- Configuration is environment-independent  
+- Deployment steps are documented  
