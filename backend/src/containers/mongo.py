@@ -2,6 +2,8 @@ from dependency_injector import containers, providers
 from pymongo import MongoClient
 
 from repositories.mongo.course_repository import MongoCourseRepository
+from repositories.mongo.migration import init_student_collection
+from repositories.mongo.student_repository import MongoStudentRepository
 
 
 class MongoContainer(containers.DeclarativeContainer):
@@ -26,4 +28,19 @@ class MongoContainer(containers.DeclarativeContainer):
     course_repository = providers.Singleton(
         MongoCourseRepository,
         collection=course_collection,
+    )
+
+    student_collection = providers.Singleton(
+        lambda db: db["students"],
+        mongo_database,
+    )
+
+    student_collection_init = providers.Resource(
+        init_student_collection,
+        collection=student_collection,
+    )
+
+    student_repository = providers.Singleton(
+        MongoStudentRepository,
+        collection=student_collection,
     )
