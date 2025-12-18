@@ -1,0 +1,102 @@
+erDiagram
+    %% STUDENT:
+    STUDENT {
+        int id PK
+        string email UK
+        int github_id UK
+        string name
+        string github_username
+    }
+
+    STUDENT 1 to many(0) SUBMISSION_MODEL : "has (github_id)"
+    STUDENT 1 to many(0) MOODLE_WORKSHEET_ROW : "contains (email)"
+
+    %% STUDENT COURSE MAP
+    MAP_USER_COURSE {
+        string email
+        int course_id
+    }
+
+    MAP_USER_COURSE many(0) to many(0) STUDENT : "maps"
+    MAP_USER_COURSE many(0) to many(0) COURSE : "maps"
+
+    %% CS50 SUBMISSIONS
+    CS50_SUBMISSIONS {
+        string slug PK
+        list[SubmissionModel] submissions
+    }
+
+    CS50_SUBMISSIONS 1 to zero or more SUBMISSION_MODEL : has
+
+    SUBMISSION_MODEL {
+        string archive
+        int checks_passed
+        int checks_run
+        int github_id
+        string github_url
+        string github_username
+        Optional[string] name
+        string slug
+        int style50_score
+        date timestamp
+    }
+
+    %% EXERCISE
+    EXERCISE {
+        EXERCISE_TYPE type
+        MOODLE_WORKSHEET_CSV_ID worksheet_id
+    }
+    EXERCISE 1 to many(0) MOODLE_WORKSHEET_CSV : "has (id)"
+    EXERCISE zero or one to many(0) CS50_SUBMISSIONS : "if type == CS50"
+    EXERCISE zero or one to many(0) MATHWORKS_COURSE : "if type == MATHWORKS_COURSE"
+    EXERCISE zero or one to many(0) MATHWORKS_EXERCISE : "if type == MATHWORKS_EXERCISE"
+    EXERCISE zero or one to many(0) GITHUB_NAME_ASSIGNMENT : "if type == GITHUB_NAME_ASSIGNMENT"
+
+    %% MOODLE WORKSHEET
+    MOODLE_WORKSHEET_CSV {
+        int id
+        list[MOODLE_WORKSHEET_ROW] rows
+    }
+
+    MOODLE_WORKSHEET_CSV 1 to many(0) MOODLE_WORKSHEET_ROW : "has 0 to multiple"
+
+    MOODLE_WORKSHEET_ROW {
+        string submission_id
+        string full_name
+        string email
+        string status
+        Optional[date] submission_beginn
+        Optional[date] deadline
+        Optional[date] last_submission
+        MoodleGrading grade
+        string scale
+        bool grade_can_be_changed
+        date submission_last_modified
+        date grade_last_modified
+        string feedback_comment
+    }
+
+    %% COURSE
+    COURSE {
+        int id PK
+        string name
+        int cs50_id
+        list[ids] exercises
+    }
+    COURSE 1 to many(0) EXERCISE : "has (id)"
+
+    %% MATHWORKS LINKS
+    MATHWORKS_COURSE {
+        id student_id
+        string course_name
+        string url
+    }
+    MATHWORKS_COURSE one or zero to one STUDENT : ""
+
+    %% MATHWORKS EXERCISES
+    MATHWORKS_EXERCISE 
+    %% data requirements unknown atm
+
+    %% GitHub name assignment
+    GITHUB_NAME_ASSIGNMENT 
+    %% doesn't require additional data

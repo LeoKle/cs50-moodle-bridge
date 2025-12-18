@@ -1,0 +1,18 @@
+classDiagram
+    class DatabaseInterface
+    <<interface>> DatabaseInterface 
+    class DatabaseInterface {
+        +insert(item: T)
+        +get(id)
+        +list(filter: dict | None)
+        +update(item: T)
+        +delete(id)
+    }
+
+    DatabaseInterface <|.. MongoDBCollection
+    class MongoDBCollection {
+        -string database_name
+        -string collection_name
+    }
+
+    
