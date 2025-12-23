@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class IGitHubUserResolver(ABC):
+class IGitHubUserClient(ABC):
     @abstractmethod
     def get_user_id(self, username: str) -> int:
         """
