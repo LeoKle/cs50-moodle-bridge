@@ -5,7 +5,7 @@ class GitHubSettings(BaseSettings):
     app_id: int = 0
     installation_id: int = 0
     private_key_base64: str = ""
-    use_auth: bool = True
+    use_auth: bool = False
 
     model_config = SettingsConfigDict(
         env_prefix="GITHUB_",

@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 
 
-class IGitHubUserClient(ABC):
+class IGitHubClientResolver(ABC):
     @abstractmethod
-    def get_user_id(self, username: str) -> int:
+    def get_user_id(self, username: str) -> int | None:
         """
         Returns the GitHub user ID, given the GitHub username
 

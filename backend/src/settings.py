@@ -3,8 +3,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from interfaces.resolver.github_setting import GitHubSettings
 from repositories.mongo.mongo_settings import MongoSettings
+from resolvers.github.github_setting import GitHubSettings
 
 
 def find_project_root(marker="pyproject.toml"):
