@@ -1,26 +1,25 @@
 classDiagram
-    class GradingStrategyInterface
-    <<interface>> GradingStrategyInterface
-    class GradingStrategyInterface {
-        +grade()
-    }
+    class CourseController
+    class ICourseService 
+    class ICourseRepository
+    CourseController ..> ICourseService
+    ICourseService ..> ICourseRepository
 
-    GradingStrategyInterface <|.. GithubNameAssignment
-    class GithubNameAssignment {
-        +grade()
-    }
+    
+    %% class EnrollmentController
+    %% EnrollmentController ..> IEnrollmentService
+    %% class IEnrollmentService {
+    %%     import_students_from_csv(course_id, file)
+    %% }
+    class IEnrollmentRepository
+    %% IEnrollmentService ..> IEnrollmentRepository
+    %% IEnrollmentService ..> IStudentRepository
+    %% IEnrollmentService ..> ICourseRepository
 
-    GradingStrategyInterface <|.. CS50Assignment
-    class CS50Assignment {
-        +grade()
+    %% class StudentController
+    class IStudentService {
+        import_github_usernames(file)
     }
-
-    GradingStrategyInterface <|.. MathworksProgressReportAssignment
-    class MathworksProgressReportAssignment {
-        +grade()
-    }
-
-    GradingStrategyInterface <|.. MathworksGraderAssignment
-    class MathworksGraderAssignment {
-        +grade()
-    }
+    class IStudentRepository
+    IStudentService ..> IStudentRepository
+    %% StudentController ..> IStudentService
