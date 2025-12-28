@@ -8,18 +8,18 @@ classDiagram
     
     %% class EnrollmentController
     %% EnrollmentController ..> IEnrollmentService
-    %% class IEnrollmentService {
-    %%     import_students_from_csv(course_id, file)
-    %% }
+    class IEnrollmentService {
+        import_students_from_csv(course_id, file)
+    }
     class IEnrollmentRepository
-    %% IEnrollmentService ..> IEnrollmentRepository
-    %% IEnrollmentService ..> IStudentRepository
-    %% IEnrollmentService ..> ICourseRepository
+    IEnrollmentService ..> IEnrollmentRepository
+    IEnrollmentService ..> IStudentRepository
+    IEnrollmentService ..> ICourseRepository
 
     %% class StudentController
-    class IStudentService {
-        import_github_usernames(file)
-    }
-    class IStudentRepository
-    IStudentService ..> IStudentRepository
+    %% class IStudentService {
+    %%     import_github_usernames(file)
+    %% }
+    %% class IStudentRepository
+    %% IStudentService ..> IStudentRepository
     %% StudentController ..> IStudentService
