@@ -22,12 +22,16 @@ class MockRequestsSession:
         self.post_call_count = 0
         self.last_post_url: str | None = None
         self.last_post_headers: dict[str, str] | None = None
-        self.next_post_response: MockGitHubResponse = MockGitHubResponse(status_code=200, json_data={})  # noqa: E501
+        self.next_post_response: MockGitHubResponse = MockGitHubResponse(
+            status_code=200, json_data={}
+        )
 
         self.get_call_count = 0
         self.last_get_url: str | None = None
         self.last_get_headers: dict[str, str] | None = None
-        self.next_get_response: MockGitHubResponse = MockGitHubResponse(status_code=200, json_data={})  # noqa: E501
+        self.next_get_response: MockGitHubResponse = MockGitHubResponse(
+            status_code=200, json_data={}
+        )
 
     def post(self, url: str, headers: dict[str, str] | None = None) -> MockGitHubResponse:
         self.post_call_count += 1
