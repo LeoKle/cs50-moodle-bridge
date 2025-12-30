@@ -51,7 +51,8 @@ def test_get_user_id_returns_id_when_user_exists(
     assert requests_session.get_call_count == 1
     assert requests_session.last_get_url == "https://api.github.com/users/octocat"
     assert requests_session.last_get_headers == {
-        "Accept": "application/vnd.github+json", "X-Test": "true",
+        "Accept": "application/vnd.github+json",
+        "X-Test": "true",
     }
 
 

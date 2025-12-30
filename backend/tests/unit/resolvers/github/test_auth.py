@@ -18,9 +18,7 @@ def github_accept_header_value() -> str:
 def github_app_private_key_b64() -> str:
     return base64.b64encode(
         b"-----BEGIN PRIVATE KEY-----\nFAKE\n-----END PRIVATE KEY-----\n"
-    ).decode(
-        "utf-8"
-    )
+    ).decode("utf-8")
 
 
 @pytest.fixture

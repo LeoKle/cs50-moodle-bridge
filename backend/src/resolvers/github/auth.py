@@ -8,7 +8,6 @@ import requests
 
 
 class GitHubAuthProvider(ABC):
-
     ACCEPT = "application/vnd.github+json"
 
     @classmethod
@@ -21,13 +20,11 @@ class GitHubAuthProvider(ABC):
 
 
 class AnonymousGitHubAuth(GitHubAuthProvider):
-
     def get_headers(self) -> dict[str, str]:
         return self.accept_headers()
 
 
 class GitHubAppAuth(GitHubAuthProvider):
-
     GITHUB_API = "https://api.github.com"
 
     def __init__(
