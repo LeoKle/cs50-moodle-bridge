@@ -18,7 +18,10 @@ class GitHubClient(IGitHubClientResolver):
         if resp.status_code == 404:
             return None
 
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except Exception as e:
+            raise RuntimeError(str(e)) from e
 
         user_id = resp.json().get("id")
         return int(user_id) if user_id is not None else None
