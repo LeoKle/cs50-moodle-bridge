@@ -1,4 +1,5 @@
 import base64
+import datetime
 
 import pytest
 
@@ -54,12 +55,25 @@ def test_anonymous_auth_returns_only_accept_header(github_accept_header_value: s
     assert anonymous_auth.get_headers() == {"Accept": github_accept_header_value}
 
 
-def test_decode_private_key_returns_decoded_string(
-    github_app_auth: GitHubAppAuth,
+def test_parse_github_time_returns_unix_timestamp(github_app_auth: GitHubAppAuth) -> None:
+    value = "2025-12-30T12:15:33Z"
+    ts = github_app_auth.parse_github_time(value)
+    assert isinstance(ts, float)
+
+
+def test_private_key_is_decoded_once_in_init(
     github_app_private_key_b64: str,
+    mock_requests_session: MockRequestsSession,
 ) -> None:
+    auth = GitHubAppAuth(
+        app_id=111,
+        installation_id=222,
+        private_key_b64=github_app_private_key_b64,
+        session=mock_requests_session,
+    )
+
     expected = base64.b64decode(github_app_private_key_b64).decode("utf-8")
-    assert github_app_auth.decode_private_key() == expected
+    assert auth._private_key_b64 == expected
 
 
 def test_refresh_token_makes_expected_post_and_sets_token_and_expiration(
@@ -69,13 +83,14 @@ def test_refresh_token_makes_expected_post_and_sets_token_and_expiration(
     fixed_now_seconds: float,
     github_accept_header_value: str,
 ) -> None:
-
     monkeypatch.setattr(GitHubAppAuth, "now", staticmethod(lambda: fixed_now_seconds))
     monkeypatch.setattr(auth_module.jwt, "encode", lambda *_a, **_k: "FAKE_JWT")
 
+    expires_at = "2025-12-30T12:15:33Z"
+
     mock_requests_session.next_post_response = MockGitHubResponse(
         status_code=201,
-        json_data={"token": "INSTALLATION_TOKEN_123"},
+        json_data={"token": "INSTALLATION_TOKEN_123", "expires_at": expires_at},
     )
 
     github_app_auth.refresh_token()
@@ -90,7 +105,9 @@ def test_refresh_token_makes_expected_post_and_sets_token_and_expiration(
     assert sent_headers["Authorization"] == "Bearer FAKE_JWT"
 
     assert github_app_auth._token == "INSTALLATION_TOKEN_123"
-    assert github_app_auth._token_expires_at == pytest.approx(fixed_now_seconds + 55 * 60)
+
+    expected_ts = datetime.datetime.fromisoformat(expires_at).astimezone(datetime.UTC).timestamp()
+    assert github_app_auth._token_expires_at == expected_ts
 
 
 def test_ensure_token_refreshes_if_token_is_missing(
@@ -171,7 +188,23 @@ def test_get_headers_returns_accept_and_token_authorization_header(
     assert headers["Authorization"] == "token TOKEN_FOR_HEADERS"
 
 
-# test coverage line 20 for abstract method
+def test_refresh_token_wraps_http_error_as_runtime_error(
+    monkeypatch,
+    github_app_auth: GitHubAppAuth,
+    mock_requests_session: MockRequestsSession,
+) -> None:
+    monkeypatch.setattr(auth_module.jwt, "encode", lambda *_a, **_k: "FAKE_JWT")
+
+    mock_requests_session.next_post_response = MockGitHubResponse(
+        status_code=401,
+        json_data={"message": "bad credentials"},
+    )
+
+    with pytest.raises(RuntimeError, match="Failed to refresh GitHub installation token"):
+        github_app_auth.refresh_token()
+
+
+# test coverage for abstract method
 def test_base_get_headers_raises_not_implemented() -> None:
     with pytest.raises(NotImplementedError):
         GitHubAuthProvider.get_headers(None)

@@ -1,7 +1,7 @@
 import base64
+import datetime
 import time
 from abc import ABC, abstractmethod
-from typing import Any
 
 import jwt
 import requests
@@ -27,6 +27,12 @@ class AnonymousGitHubAuth(GitHubAuthProvider):
 class GitHubAppAuth(GitHubAuthProvider):
     GITHUB_API = "https://api.github.com"
 
+    # protects against small clock differences between client and server
+    CLOCK_SKEW_SECONDS = 60
+
+    # JWT for GitHub App authentication
+    JWT_LIFETIME_SECONDS = 5 * 60
+
     def __init__(
         self,
         app_id: int,
@@ -38,7 +44,7 @@ class GitHubAppAuth(GitHubAuthProvider):
     ) -> None:
         self._app_id = app_id
         self._installation_id = installation_id
-        self._private_key_b64 = private_key_b64
+        self._private_key_b64 = base64.b64decode(private_key_b64).decode("utf-8")
         self._session = session or requests.Session()
 
         self._token: str | None = None
@@ -49,15 +55,18 @@ class GitHubAppAuth(GitHubAuthProvider):
     def now() -> float:
         return time.time()
 
-    def decode_private_key(self) -> str:
-        return base64.b64decode(self._private_key_b64).decode("utf-8")
+    def parse_github_time(self, value: str) -> float:
+        return datetime.datetime.fromisoformat(value).astimezone(datetime.UTC).timestamp()
 
     def refresh_token(self) -> None:
-        private_key = self.decode_private_key()
         now = int(self.now())
 
-        payload = {"iat": now - 60, "exp": now + 5 * 60, "iss": self._app_id}
-        jwt_token = jwt.encode(payload, private_key, algorithm="RS256")
+        payload = {
+            "iat": now - self.CLOCK_SKEW_SECONDS,
+            "exp": now + self.JWT_LIFETIME_SECONDS,
+            "iss": self._app_id,
+        }
+        jwt_token = jwt.encode(payload, self._private_key_b64, algorithm="RS256")
 
         url = f"{self.GITHUB_API}/app/installations/{self._installation_id}/access_tokens"
         headers = {
@@ -66,12 +75,16 @@ class GitHubAppAuth(GitHubAuthProvider):
         }
 
         resp = self._session.post(url, headers=headers)
-        resp.raise_for_status()
+        try:
+            resp.raise_for_status()
+        except requests.HTTPError as e:
+            msg = "Failed to refresh GitHub installation token"
+            raise RuntimeError(msg) from e
 
-        data: dict[str, Any] = resp.json()
+        data = resp.json()
         self._token = str(data["token"])
 
-        self._token_expires_at = self.now() + 55 * 60
+        self._token_expires_at = self.parse_github_time(data["expires_at"])
 
     def ensure_token(self) -> str:
         if self._token is None:

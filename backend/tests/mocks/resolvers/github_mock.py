@@ -1,5 +1,7 @@
 from typing import Any
 
+import requests
+
 
 class MockGitHubResponse:
     def __init__(self, *, status_code: int, json_data: dict[str, Any] | None = None) -> None:
@@ -14,7 +16,7 @@ class MockGitHubResponse:
         self.raise_for_status_called = True
         if self.status_code >= 400:
             msg = f"HTTP {self.status_code}"
-            raise RuntimeError(msg)
+            raise requests.HTTPError(msg)
 
 
 class MockRequestsSession:
