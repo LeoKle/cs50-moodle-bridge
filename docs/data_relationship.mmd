@@ -61,20 +61,36 @@ erDiagram
     MOODLE_WORKSHEET_CSV 1 to many(0) MOODLE_WORKSHEET_ROW : "has 0 to multiple"
 
     MOODLE_WORKSHEET_ROW {
+        string id PK
         string submission_id
-        string full_name
         string email
         string status
-        Optional[date] submission_beginn
-        Optional[date] deadline
-        Optional[date] last_submission
-        MoodleGrading grade
-        string scale
+        GradeType grade_type
+        float grade_numeric
+        PassFailGrade grade_pass_fail
+        string grade_scale
         bool grade_can_be_changed
-        date submission_last_modified
-        date grade_last_modified
+        datetime submission_last_modified
+        datetime grade_last_modified
         string feedback_comment
+        Optional[datetime] submission_begin
+        Optional[datetime] deadline
+        Optional[datetime] last_submission
     }
+
+    GRADE_TYPE {
+        string value PK
+    }
+
+    PASS_FAIL_GRADE {
+        int value PK
+        string name
+    }
+
+    MOODLE_WORKSHEET_ROW ||--|| GRADE_TYPE : grade_type
+    MOODLE_WORKSHEET_ROW ||--|| PASS_FAIL_GRADE : grade_pass_fail
+
+    
 
     %% COURSE
     COURSE {
