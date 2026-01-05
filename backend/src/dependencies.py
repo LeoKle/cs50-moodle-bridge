@@ -1,11 +1,11 @@
 import requests
 from dependency_injector import containers, providers
-from pymongo import MongoClient
 
-from repositories.mongo.course_repository import MongoCourseRepository
+from containers.mongo import MongoContainer
 from resolvers.github.auth import AnonymousGitHubAuth, GitHubAppAuth
 from resolvers.github.client import GitHubClient
 from services.course import CourseService
+from services.enrollment import EnrollmentService
 from settings import Settings
 
 
@@ -13,30 +13,11 @@ class DependencyContainer(containers.DeclarativeContainer):
     config = providers.Configuration()
     config.from_pydantic(Settings())
 
-    mongo_client = providers.Singleton(
-        MongoClient,
-        config.mongo.uri,
-    )
-
-    mongo_database = providers.Singleton(
-        lambda client, database: client[database],
-        mongo_client,
-        database=config.mongo.database,
-    )
-
-    course_collection = providers.Singleton(
-        lambda db: db["courses"],
-        mongo_database,
-    )
-
-    course_repository = providers.Singleton(
-        MongoCourseRepository,
-        collection=course_collection,
-    )
+    mongo = providers.Container(MongoContainer, config=config)
 
     course_service = providers.Singleton(
         CourseService,
-        course_repository=course_repository,
+        course_repository=mongo.course_repository,
     )
 
     github_session = providers.Singleton(requests.Session)
@@ -57,6 +38,13 @@ class DependencyContainer(containers.DeclarativeContainer):
         GitHubClient,
         auth=github_auth,
         session=github_session,
+    )
+
+    enrollment_service = providers.Singleton(
+        EnrollmentService,
+        student_repository=mongo.student_repository,
+        course_repository=mongo.course_repository,
+        enrollment_repository=mongo.enrollment_repository,
     )
 
 
