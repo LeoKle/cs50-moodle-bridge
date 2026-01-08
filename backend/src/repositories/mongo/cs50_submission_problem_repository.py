@@ -1,3 +1,6 @@
+from datetime import datetime
+from email.utils import format_datetime
+
 from pymongo.collection import Collection
 
 from interfaces.repositories.cs50_submission_problem_repository_interface import (
@@ -25,4 +28,10 @@ class MongoSubmissionProblemRepository(ICS50SubmissionProblemRepository):
             return None
 
         doc.pop("_id", None)
+
+        subs = doc.get("submissions", [])
+        for s in subs:
+            ts = s.get("timestamp")
+            if isinstance(ts, datetime):
+                s["timestamp"] = format_datetime(ts)
         return CS50SubmissionProblemModel(**doc)
