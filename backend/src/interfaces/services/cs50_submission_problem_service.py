@@ -8,7 +8,7 @@ class SubmissionUploadResult:
     submissions_added: int
 
 
-class ISubmissionProblemService(ABC):
+class ICS50SubmissionProblemService(ABC):
     @abstractmethod
     def import_submissions_from_json(
         self, slug: str, file: BinaryIO
