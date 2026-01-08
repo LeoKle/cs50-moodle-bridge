@@ -10,6 +10,4 @@ class SubmissionUploadResult:
 
 class ICS50SubmissionProblemService(ABC):
     @abstractmethod
-    def import_submissions_from_json(
-        self, slug: str, file: BinaryIO
-    ) -> SubmissionUploadResult: ...
+    def import_submissions_from_json(self, slug: str, file: BinaryIO) -> SubmissionUploadResult: ...
