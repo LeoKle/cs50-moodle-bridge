@@ -23,6 +23,8 @@ course_service = CourseService()
 # Header
 st.title("📚 Courses")
 
+# Add course button
+render_add_course_dialog(course_service)
 
 st.divider()
 
