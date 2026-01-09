@@ -11,7 +11,7 @@ def render_add_course_dialog(course_service) -> None:
     if "show_add_dialog" not in st.session_state:
         st.session_state.show_add_dialog = False
 
-    if st.button("➕ Add Course", type="primary", use_container_width=True):
+    if st.button("➕ Add Course", type="primary", use_container_width=True):  # noqa: RUF001
         st.session_state.show_add_dialog = True
 
     if st.session_state.show_add_dialog:
