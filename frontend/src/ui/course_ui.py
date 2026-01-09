@@ -18,18 +18,12 @@ def render_add_course_dialog(course_service) -> None:
         with st.form("add_course_form", clear_on_submit=True):
             st.subheader("Add New Course")
 
-            course_name = st.text_input(
-                "Course Name*", placeholder="e.g., Introduction-to-CS"
-            )
-            cs50_id = st.number_input(
-                "CS50 ID (optional)", min_value=0, value=0, step=1
-            )
+            course_name = st.text_input("Course Name*", placeholder="e.g., Introduction-to-CS")
+            cs50_id = st.number_input("CS50 ID (optional)", min_value=0, value=0, step=1)
 
             col1, col2 = st.columns(2)
             with col1:
-                submit = st.form_submit_button(
-                    "Create", type="primary", use_container_width=True
-                )
+                submit = st.form_submit_button("Create", type="primary", use_container_width=True)
             with col2:
                 cancel = st.form_submit_button("Cancel", use_container_width=True)
 
@@ -39,9 +33,7 @@ def render_add_course_dialog(course_service) -> None:
                 else:
                     try:
                         cs50_id_value = cs50_id if cs50_id > 0 else None
-                        course_service.create_course(
-                            course_name.strip(), cs50_id_value
-                        )
+                        course_service.create_course(course_name.strip(), cs50_id_value)
                         st.success(f"Course '{course_name}' created successfully!")
                         st.session_state.show_add_dialog = False
                         st.rerun()
@@ -124,9 +116,7 @@ def render_course_list(courses: list[dict[str, Any]]) -> None:
                 with detail_col1:
                     st.markdown("##### 📋 Course Information")
                     st.markdown(f"**Course ID:** `{course_id}`")
-                    st.markdown(
-                        f"**CS50 ID:** {cs50_id or '_Not linked_'}"
-                    )
+                    st.markdown(f"**CS50 ID:** {cs50_id or '_Not linked_'}")
                     st.markdown(f"**Name:** {course_name}")
 
                 with detail_col2:
