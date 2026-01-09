@@ -1,24 +1,30 @@
-from typing import Any, Dict, List
+
+from typing import Any
+
+
+class CourseServiceMockError(Exception):
+    """Custom exception for CourseService mock errors."""
 
 
 class MockCourseService:
     """Mock implementation of CourseService for testing."""
 
     def __init__(self):
-        self._data: Dict[str, Dict[str, Any]] = {}
+        self._data: dict[str, dict[str, Any]] = {}
         self._id_counter = 1
 
-    def get_courses(self) -> List[Dict[str, Any]]:
+    def get_courses(self) -> list[dict[str, Any]]:
         """Fetch all courses."""
         return list(self._data.values())
 
-    def get_course(self, course_id: str) -> Dict[str, Any]:
+    def get_course(self, course_id: str) -> dict[str, Any]:
         """Fetch a single course by ID."""
         if course_id not in self._data:
-            raise Exception(f"Course with id {course_id} not found")
+            msg = f"Course with id {course_id} not found"
+            raise CourseServiceMockError(msg)
         return self._data[course_id]
 
-    def create_course(self, name: str, cs50_id: int | None = None) -> Dict[str, Any]:
+    def create_course(self, name: str, cs50_id: int | None = None) -> dict[str, Any]:
         """Create a new course."""
         course_id = str(self._id_counter)
         self._id_counter += 1

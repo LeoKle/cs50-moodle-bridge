@@ -1,6 +1,9 @@
+"""UI components for course management."""
+
+from typing import Any
+
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
-from typing import List, Dict, Any
 
 
 def render_add_course_dialog(course_service) -> None:
@@ -14,35 +17,43 @@ def render_add_course_dialog(course_service) -> None:
     if st.session_state.show_add_dialog:
         with st.form("add_course_form", clear_on_submit=True):
             st.subheader("Add New Course")
-            
-            course_name = st.text_input("Course Name*", placeholder="e.g., Introduction-to-CS")
-            cs50_id = st.number_input("CS50 ID (optional)", min_value=0, value=0, step=1)
-            
+
+            course_name = st.text_input(
+                "Course Name*", placeholder="e.g., Introduction-to-CS"
+            )
+            cs50_id = st.number_input(
+                "CS50 ID (optional)", min_value=0, value=0, step=1
+            )
+
             col1, col2 = st.columns(2)
             with col1:
-                submit = st.form_submit_button("Create", type="primary", use_container_width=True)
+                submit = st.form_submit_button(
+                    "Create", type="primary", use_container_width=True
+                )
             with col2:
                 cancel = st.form_submit_button("Cancel", use_container_width=True)
-            
+
             if submit:
                 if not course_name or not course_name.strip():
                     st.error("Course name is required")
                 else:
                     try:
                         cs50_id_value = cs50_id if cs50_id > 0 else None
-                        course_service.create_course(course_name.strip(), cs50_id_value)
+                        course_service.create_course(
+                            course_name.strip(), cs50_id_value
+                        )
                         st.success(f"Course '{course_name}' created successfully!")
                         st.session_state.show_add_dialog = False
                         st.rerun()
                     except Exception as e:
-                        st.error(f"Failed to create course: {str(e)}")
-            
+                        st.error(f"Failed to create course: {e!s}")
+                        raise
             if cancel:
                 st.session_state.show_add_dialog = False
                 st.rerun()
 
 
-def render_course_list(courses: List[Dict[str, Any]]) -> None:
+def render_course_list(courses: list[dict[str, Any]]) -> None:
     """Render the list of courses."""
     if not courses:
         st.info("No courses available yet.")
@@ -57,7 +68,7 @@ def render_course_list(courses: List[Dict[str, Any]]) -> None:
         course_id = course.get("id", "")
         cs50_id = course.get("cs50_id")
         exercise_ids = course.get("exercise_ids", [])
-        
+
         with stylable_container(
             key=f"course_{course_id}",
             css_styles="""
@@ -73,13 +84,13 @@ def render_course_list(courses: List[Dict[str, Any]]) -> None:
                     border-color: rgba(49, 51, 63, 0.4);
                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 }
-            """
+            """,
         ):
             col1, col2, col3 = st.columns([0.05, 0.75, 0.2])
-            
+
             with col1:
                 st.markdown("📖")
-            
+
             with col2:
                 st.markdown(f"**{course_name}**")
                 # Show quick info
@@ -88,7 +99,7 @@ def render_course_list(courses: List[Dict[str, Any]]) -> None:
                     info_parts.append(f"CS50 ID: {cs50_id}")
                 info_parts.append(f"{len(exercise_ids)} exercise(s)")
                 st.caption(" • ".join(info_parts))
-            
+
             with col3:
                 # Toggle button to expand/collapse details
                 is_expanded = st.session_state.expanded_course_id == course_id
@@ -96,26 +107,28 @@ def render_course_list(courses: List[Dict[str, Any]]) -> None:
                     "Hide Details" if is_expanded else "View Details",
                     key=f"toggle_{course_id}",
                     use_container_width=True,
-                    type="primary" if is_expanded else "secondary"
+                    type="primary" if is_expanded else "secondary",
                 ):
                     if is_expanded:
                         st.session_state.expanded_course_id = None
                     else:
                         st.session_state.expanded_course_id = course_id
                     st.rerun()
-            
+
             # Show details if expanded
             if st.session_state.expanded_course_id == course_id:
                 st.divider()
-                
+
                 detail_col1, detail_col2 = st.columns(2)
-                
+
                 with detail_col1:
                     st.markdown("##### 📋 Course Information")
                     st.markdown(f"**Course ID:** `{course_id}`")
-                    st.markdown(f"**CS50 ID:** {cs50_id if cs50_id else '_Not linked_'}")
+                    st.markdown(
+                        f"**CS50 ID:** {cs50_id or '_Not linked_'}"
+                    )
                     st.markdown(f"**Name:** {course_name}")
-                
+
                 with detail_col2:
                     st.markdown("##### 🎯 Exercises")
                     if exercise_ids:
