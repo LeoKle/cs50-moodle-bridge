@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import Mock, patch
+
+import pytest
 import requests
 
 from services.course_service import CourseService
@@ -47,7 +48,7 @@ def test_get_courses_returns_list_on_success(course_service, mock_response):
     with patch("requests.get", return_value=mock_response) as mock_get:
         result = course_service.get_courses()
 
-        mock_get.assert_called_once_with(course_service.api_url)
+        mock_get.assert_called_once_with(course_service.api_url, timeout=30)
         assert result == mock_courses
         assert len(result) == 2
 
@@ -80,7 +81,7 @@ def test_get_course_returns_course_on_success(course_service, mock_response):
     with patch("requests.get", return_value=mock_response) as mock_get:
         result = course_service.get_course("123")
 
-        mock_get.assert_called_once_with(f"{course_service.api_url}/123")
+        mock_get.assert_called_once_with(f"{course_service.api_url}/123", timeout=30)
         assert result == mock_course
         assert result["id"] == "123"
 
@@ -114,7 +115,7 @@ def test_create_course_with_name_only(course_service, mock_response):
         result = course_service.create_course("New Course")
 
         mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course"}
+            course_service.api_url, json={"name": "New Course"}, timeout=30
         )
         assert result == mock_course
         assert result["name"] == "New Course"
@@ -130,7 +131,7 @@ def test_create_course_with_name_and_cs50_id(course_service, mock_response):
         result = course_service.create_course("New Course", cs50_id=100)
 
         mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course", "cs50_id": 100}
+            course_service.api_url, json={"name": "New Course", "cs50_id": 100}, timeout=30
         )
         assert result == mock_course
         assert result["cs50_id"] == 100
@@ -145,7 +146,7 @@ def test_create_course_with_none_cs50_id(course_service, mock_response):
         result = course_service.create_course("New Course", cs50_id=None)
 
         mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course"}
+            course_service.api_url, json={"name": "New Course"}, timeout=30
         )
         assert result == mock_course
 
