@@ -9,6 +9,8 @@ from tests.mocks.repositories.cs50_submission_problem_repository_mock import (
     MockCS50SubmissionProblemRepository,
 )
 
+pytestmark = pytest.mark.unit
+
 
 def make_file(payload) -> io.BytesIO:
     return io.BytesIO(json.dumps(payload).encode("utf-8"))
