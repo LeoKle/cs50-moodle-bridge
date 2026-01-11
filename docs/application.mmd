@@ -1,25 +1,114 @@
 classDiagram
-    class CourseController
-    class ICourseService 
-    class ICourseRepository
+    class CourseController {
+        GET /courses/course_id
+        GET /courses
+        POST /courses
+        PATCH /courses/course_id
+        DELETE /courses/course_id
+    }
+    class ICourseService {
+        get_course()
+        get_courses()
+        create_course()
+        update_course()
+        delete_course()
+    }
+    class ICourseRepository {
+        %% create()
+        %% get()
+        %% get_all()
+        %% update()
+        %% delete()
+    }
     CourseController ..> ICourseService
     ICourseService ..> ICourseRepository
 
     
-    %% class EnrollmentController
-    %% EnrollmentController ..> IEnrollmentService
+    class EnrollmentController {
+        POST /enroll(file)
+    }
+    EnrollmentController ..> IEnrollmentService
     class IEnrollmentService {
         import_students_from_csv(course_id, file)
     }
-    class IEnrollmentRepository
+    class IEnrollmentRepository {
+        %% create()
+        %% get()
+        %% get_all()
+        %% update()
+        %% delete()
+    }
     IEnrollmentService ..> IEnrollmentRepository
     IEnrollmentService ..> IStudentRepository
     IEnrollmentService ..> ICourseRepository
 
     %% class StudentController
-    %% class IStudentService {
-    %%     import_github_usernames(file)
+    %% StudentController ..> IStudentService
+    class IStudentService {
+        get_student()
+        get_student_by_email()
+        get_students()
+        create_student()
+        update_student()
+        delete_student()
+    }
+    class IStudentRepository {
+        %% create()
+        %% get()
+        get_by_email()
+        %% get_all()
+        %% update()
+        %% delete()
+    }
+    IStudentService ..> IStudentRepository
+
+    class ICS50SubmissionProblemRepository {
+        upload_submissions()
+        get_submissions()
+    }
+
+    class ICS50SubmissionProblemService {
+        import_submissions_from_json()
+    }
+    ICS50SubmissionProblemService ..> ICS50SubmissionProblemRepository
+
+    class IGitHubClientResolver {
+        get_user_id()
+    }
+
+    class GitHubClient {
+        %% get_user_id()
+    }
+    GitHubClient ..|> IGitHubClientResolver
+    GitHubClient ..> GitHubAuthProvider
+
+    class GitHubAuthProvider {
+        accept_headers()
+        %% get_headers()
+    }
+    class AnonymousGitHubAuth {
+        get_headers()
+    }
+    AnonymousGitHubAuth ..|> GitHubAuthProvider
+    class GitHubAppAuth {
+        now()
+        parse_github_time()
+        refresh_token()
+        ensure_token()
+        %% get_headers()
+    }
+    GitHubAppAuth ..|> GitHubAuthProvider
+
+    %% class IRepository {
+    %%     create()
+    %%     get()
+    %%     get_all()
+    %%     update()
+    %%     delete()
     %% }
+    %% IRepository <|.. ICourseRepository
+    %% IRepository <|.. IEnrollmentRepository
+    %% IRepository <|.. IStudentRepository
     %% class IStudentRepository
     %% IStudentService ..> IStudentRepository
     %% StudentController ..> IStudentService
