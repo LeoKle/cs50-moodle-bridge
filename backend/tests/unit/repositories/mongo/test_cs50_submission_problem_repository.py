@@ -1,6 +1,3 @@
-import json
-from pathlib import Path
-
 import mongomock
 import pytest
 
@@ -111,11 +108,34 @@ def test_upload_submissions_updates_existing_slug(repo):
 
 def test_upload_and_get_with_sample_cs50_json(repo):
 
-    PROJECT_ROOT = Path(__file__).resolve().parents[5]
-    DATA_FILE = PROJECT_ROOT / "data" / "cs50.json"
-
-    with Path(DATA_FILE).open(encoding="utf-8") as f:
-        data = json.load(f)
+    data = {
+        "hsddigitallabor/problems/adg2025/intervals": [
+            {
+                "archive": "https://github.com/me50/github_name/archive/hash_value.zip",
+                "checks_passed": 13,
+                "checks_run": 13,
+                "github_id": 123456789,
+                "github_url": "https://github.com/me50/github_name/tree/hash_value",
+                "github_username": "octocat",
+                "name": None,
+                "slug": "hsddigitallabor/problems/adg2025/intervals",
+                "style50_score": 1.0,
+                "timestamp": "Mon, 01 Dec 2025 08:53:16PM CET",
+            },
+            {
+                "archive": "https://github.com/me50/github_name/archive/hash_value.zip",
+                "checks_passed": None,
+                "checks_run": None,
+                "github_id": 123456789,
+                "github_url": "https://github.com/me50/github_name/tree/hash_value",
+                "github_username": "octocat",
+                "name": "Full Name",
+                "slug": "hsddigitallabor/problems/adg2025/intervals",
+                "style50_score": 1.0,
+                "timestamp": "Mon, 01 Dec 2025 08:20:07PM CET",
+            },
+        ]
+    }
 
     slug = next(iter(data.keys()))
     items = data[slug]
