@@ -62,6 +62,16 @@ classDiagram
     }
     IStudentService ..> IStudentRepository
 
+    class ICS50SubmissionProblemRepository {
+        upload_submissions()
+        get_submissions()
+    }
+
+    class ICS50SubmissionProblemService {
+        import_submissions_from_json()
+    }
+    ICS50SubmissionProblemService ..> ICS50SubmissionProblemRepository
+
     class IGitHubClientResolver {
         get_user_id()
     }
