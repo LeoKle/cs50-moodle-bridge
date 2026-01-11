@@ -109,3 +109,11 @@ classDiagram
     %% IRepository <|.. ICourseRepository
     %% IRepository <|.. IEnrollmentRepository
     %% IRepository <|.. IStudentRepository
+    %% class IStudentRepository
+    %% IStudentService ..> IStudentRepository
+    %% StudentController ..> IStudentService
+
+    class IGitHubService {
+        import_github_names(course_id, file)
+    }
+    IGitHubService ..> IStudentRepository

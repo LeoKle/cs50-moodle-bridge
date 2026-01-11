@@ -8,4 +8,4 @@ class StudentModel(BaseModel):
     email: str
     github_id: int | None = None
     name: str = ""
-    github_username: str = ""
+    github_username: str | None = None
