@@ -1,4 +1,3 @@
-
 import streamlit as st
 
 from services.course_service import CourseService, CourseServiceError
