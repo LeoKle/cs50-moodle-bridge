@@ -17,11 +17,6 @@ uv run pytest
 uv run pytest -m unit
 ```
 
-### Run only integration tests:
-```bash
-uv run pytest -m integration
-```
-
 ### Run tests with coverage:
 ```bash
 uv run pytest --cov=src --cov-report=html
@@ -36,8 +31,3 @@ uv run pytest tests/unit/services/test_course_service.py
 ```bash
 uv run pytest tests/unit/services/test_course_service.py::test_get_courses_returns_list_on_success
 ```
-
-### Streamlit Components in Testing
-- Mock Streamlit (`st`) module to avoid actual rendering
-- Track calls to verify correct behavior
-- Mock session state as a dictionary
