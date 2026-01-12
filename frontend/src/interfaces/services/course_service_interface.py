@@ -3,7 +3,6 @@ from typing import Any
 
 
 class CourseServiceInterface(ABC):
-
     @abstractmethod
     def get_courses(self) -> list[dict[str, Any]]: ...
 
