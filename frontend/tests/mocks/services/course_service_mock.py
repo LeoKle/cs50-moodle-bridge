@@ -1,11 +1,13 @@
 from typing import Any
 
+from interfaces.services import CourseServiceInterface
+
 
 class CourseServiceMockError(Exception):
     """Custom exception for CourseService mock errors."""
 
 
-class MockCourseService:
+class MockCourseService(CourseServiceInterface):
     """Mock implementation of CourseService for testing."""
 
     def __init__(self):

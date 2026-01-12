@@ -1,16 +1,17 @@
-"""Service module for handling course-related API calls."""
 
 import os
 from typing import Any
 
 import requests
 
+from interfaces.services import CourseServiceInterface
+
 
 class CourseServiceError(Exception):
     """Custom exception for CourseService errors."""
 
 
-class CourseService:
+class CourseService(CourseServiceInterface):
     """Service to handle course-related API calls to the backend."""
 
     def __init__(self) -> None:
