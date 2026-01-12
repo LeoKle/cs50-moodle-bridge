@@ -1,4 +1,3 @@
-"""UI components for course management."""
 
 from typing import Any
 
