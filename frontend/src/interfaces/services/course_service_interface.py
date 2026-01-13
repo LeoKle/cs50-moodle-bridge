@@ -1,13 +1,16 @@
 from abc import ABC, abstractmethod
-from typing import Any
+
+from modles.course import CourseCreate, CourseOut
 
 
 class CourseServiceInterface(ABC):
     @abstractmethod
-    def get_courses(self) -> list[dict[str, Any]]: ...
+    def get_courses(self) -> list[CourseOut]: ...
 
     @abstractmethod
-    def get_course(self, course_id: str) -> dict[str, Any]: ...
+    def get_course(self, course_id: str) -> CourseOut: ...
 
     @abstractmethod
-    def create_course(self, name: str, cs50_id: int | None = None) -> dict[str, Any]: ...
+    def create_course(
+        self, course: CourseCreate | str, cs50_id: int | None = None
+    ) -> CourseOut: ...
