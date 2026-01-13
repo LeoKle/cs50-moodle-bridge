@@ -2,8 +2,15 @@ from dependency_injector import containers, providers
 from pymongo import MongoClient
 
 from repositories.mongo.course_repository import MongoCourseRepository
+from repositories.mongo.cs50_submission_problem_repository import (
+    MongoSubmissionProblemRepository,
+)
 from repositories.mongo.enrollment_repository import MongoEnrollmentRepository
-from repositories.mongo.migration import init_enrollment_collection, init_student_collection
+from repositories.mongo.migration import (
+    init_cs50_submission_problem_collection,
+    init_enrollment_collection,
+    init_student_collection,
+)
 from repositories.mongo.student_repository import MongoStudentRepository
 
 
@@ -58,4 +65,19 @@ class MongoContainer(containers.DeclarativeContainer):
 
     enrollment_repository = providers.Singleton(
         MongoEnrollmentRepository, collection=enrollment_collection
+    )
+
+    cs50_submission_problem_collection = providers.Singleton(
+        lambda db: db["cs50_submissions"],
+        mongo_database,
+    )
+
+    cs50_submission_problem_collection_init = providers.Resource(
+        init_cs50_submission_problem_collection,
+        collection=cs50_submission_problem_collection,
+    )
+
+    cs50_submission_problem_repository = providers.Singleton(
+        MongoSubmissionProblemRepository,
+        collection=cs50_submission_problem_collection,
     )
