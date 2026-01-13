@@ -1,7 +1,8 @@
 import streamlit as st
+from streamlit_extras.stylable_container import stylable_container
+
 from interfaces.services.course_service_interface import CourseServiceInterface
 from models.course import CourseCreate, CourseOut
-from streamlit_extras.stylable_container import stylable_container
 
 
 def render_add_course_dialog(course_service: CourseServiceInterface) -> None:
