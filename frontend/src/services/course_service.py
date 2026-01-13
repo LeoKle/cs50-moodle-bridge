@@ -1,10 +1,9 @@
 import os
 
 import requests
-from pydantic import ValidationError
-
 from interfaces.services import CourseServiceInterface
-from modles.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut
+from pydantic import ValidationError
 
 
 class CourseServiceError(Exception):

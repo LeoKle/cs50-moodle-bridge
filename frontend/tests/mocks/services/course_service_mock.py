@@ -1,5 +1,5 @@
 from interfaces.services import CourseServiceInterface
-from modles.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut
 
 
 class CourseServiceMockError(Exception):
