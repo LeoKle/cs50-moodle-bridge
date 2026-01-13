@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from modles.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut
 
 
 class CourseServiceInterface(ABC):
