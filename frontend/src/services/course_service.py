@@ -1,9 +1,10 @@
 import os
-from typing import Any
 
 import requests
+from pydantic import ValidationError
 
 from interfaces.services import CourseServiceInterface
+from modles.course import CourseCreate, CourseOut
 
 
 class CourseServiceError(Exception):
@@ -18,36 +19,42 @@ class CourseService(CourseServiceInterface):
         self.base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
         self.api_url = f"{self.base_url}/api/v1/courses"
 
-    def get_courses(self) -> list[dict[str, Any]]:
-        """Fetch all courses from the backend."""
+    def get_courses(self) -> list[CourseOut]:
+        """Fetch all courses from the backend and validate with pydantic."""
         try:
             response = requests.get(self.api_url, timeout=30)
             response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
+            payload = response.json()
+            return [CourseOut.model_validate(item) for item in payload]
+        except (requests.exceptions.RequestException, ValidationError) as e:
             msg = f"Failed to fetch courses: {e!s}"
             raise CourseServiceError(msg) from e
 
-    def get_course(self, course_id: str) -> dict[str, Any]:
-        """Fetch a single course by ID from the backend."""
+    def get_course(self, course_id: str) -> CourseOut:
+        """Fetch a single course by ID from the backend and validate response."""
         try:
             response = requests.get(f"{self.api_url}/{course_id}", timeout=30)
             response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
+            return CourseOut.model_validate(response.json())
+        except (requests.exceptions.RequestException, ValidationError) as e:
             msg = f"Failed to fetch course: {e!s}"
             raise CourseServiceError(msg) from e
 
-    def create_course(self, name: str, cs50_id: int | None = None) -> dict[str, Any]:
-        """Create a new course."""
+    def create_course(self, course: CourseCreate | str, cs50_id: int | None = None) -> CourseOut:
+        """Create a new course using validated input and validate the response."""
         try:
-            data: dict[str, Any] = {"name": name}
-            if cs50_id is not None:
-                data["cs50_id"] = cs50_id
-
-            response = requests.post(self.api_url, json=data, timeout=30)
+            payload = (
+                CourseCreate(name=course, cs50_id=cs50_id)
+                if isinstance(course, str)
+                else CourseCreate.model_validate(course)
+            )
+            response = requests.post(
+                self.api_url,
+                json=payload.model_dump(by_alias=True, exclude_none=True),
+                timeout=30,
+            )
             response.raise_for_status()
-            return response.json()
-        except requests.exceptions.RequestException as e:
+            return CourseOut.model_validate(response.json())
+        except (requests.exceptions.RequestException, ValidationError) as e:
             msg = f"Failed to create course: {e!s}"
             raise CourseServiceError(msg) from e

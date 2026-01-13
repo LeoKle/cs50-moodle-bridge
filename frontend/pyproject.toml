@@ -8,6 +8,7 @@ dependencies = [
     "streamlit>=1.52.2",
     "streamlit-extras>=0.4.7",
     "requests>=2.32.3",
+    "pydantic>=2.10.6",
 ]
 
 

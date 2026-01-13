@@ -1,10 +1,11 @@
-from typing import Any
-
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
+from interfaces.services.course_service_interface import CourseServiceInterface
+from modles.course import CourseCreate, CourseOut
 
-def render_add_course_dialog(course_service) -> None:
+
+def render_add_course_dialog(course_service: CourseServiceInterface) -> None:
     """Render dialog to add a new course."""
     if "show_add_dialog" not in st.session_state:
         st.session_state.show_add_dialog = False
@@ -31,7 +32,8 @@ def render_add_course_dialog(course_service) -> None:
                 else:
                     try:
                         cs50_id_value = cs50_id if cs50_id > 0 else None
-                        course_service.create_course(course_name.strip(), cs50_id_value)
+                        new_course = CourseCreate(name=course_name.strip(), cs50_id=cs50_id_value)
+                        course_service.create_course(new_course)
                         st.success(f"Course '{course_name}' created successfully!")
                         st.session_state.show_add_dialog = False
                         st.rerun()
@@ -43,7 +45,7 @@ def render_add_course_dialog(course_service) -> None:
                 st.rerun()
 
 
-def render_course_list(courses: list[dict[str, Any]]) -> None:
+def render_course_list(courses: list[CourseOut]) -> None:
     """Render the list of courses."""
     if not courses:
         st.info("No courses available yet.")
@@ -54,10 +56,10 @@ def render_course_list(courses: list[dict[str, Any]]) -> None:
         st.session_state.expanded_course_id = None
 
     for course in courses:
-        course_name = course.get("name", "Unnamed Course")
-        course_id = course.get("id", "")
-        cs50_id = course.get("cs50_id")
-        exercise_ids = course.get("exercise_ids", [])
+        course_name = course.name or "Unnamed Course"
+        course_id = course.id
+        cs50_id = course.cs50_id
+        exercise_ids = course.exercise_ids or []
 
         with stylable_container(
             key=f"course_{course_id}",
