@@ -85,6 +85,7 @@ def render_course_list(courses: list[CourseOut]) -> None:
 
             with col2:
                 st.markdown(f"**{course_name}**")
+
                 # Show quick info
                 info_parts = []
                 if cs50_id:

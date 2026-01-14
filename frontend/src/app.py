@@ -2,6 +2,7 @@ import streamlit as st
 
 from services.course_service import CourseService, CourseServiceError
 from ui.course_ui import render_add_course_dialog, render_course_list
+from utils.error_handler import handle_service_error
 
 st.set_page_config(
     page_title="CS50 Moodle Bridge",
@@ -20,5 +21,4 @@ try:
     courses = course_service.get_courses()
     render_course_list(courses)
 except CourseServiceError as e:
-    st.error(f"Failed to load courses: {e!s}")
-    st.info("Make sure the backend is running and accessible.")
+    handle_service_error(e, "load courses")
