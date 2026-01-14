@@ -1,8 +1,11 @@
+"""Course service for handling API calls to the backend."""
+
 import os
 
 import requests
 from pydantic import ValidationError
 
+import constants as const
 from interfaces.services import CourseServiceInterface
 from models.course import CourseCreate, CourseOut
 
@@ -16,13 +19,13 @@ class CourseService(CourseServiceInterface):
 
     def __init__(self) -> None:
         """Initialize the CourseService with backend URL configuration."""
-        self.base_url = os.getenv("BACKEND_URL", "http://localhost:8000")
-        self.api_url = f"{self.base_url}/api/v1/courses"
+        self.base_url = os.getenv("BACKEND_URL", const.DEFAULT_BACKEND_URL)
+        self.api_url = f"{self.base_url}{const.API_V1_PREFIX}{const.COURSES_ENDPOINT}"
 
     def get_courses(self) -> list[CourseOut]:
         """Fetch all courses from the backend and validate with pydantic."""
         try:
-            response = requests.get(self.api_url, timeout=30)
+            response = requests.get(self.api_url, timeout=const.REQUEST_TIMEOUT)
             response.raise_for_status()
             payload = response.json()
             return [CourseOut.model_validate(item) for item in payload]
@@ -33,7 +36,7 @@ class CourseService(CourseServiceInterface):
     def get_course(self, course_id: str) -> CourseOut:
         """Fetch a single course by ID from the backend and validate response."""
         try:
-            response = requests.get(f"{self.api_url}/{course_id}", timeout=30)
+            response = requests.get(f"{self.api_url}/{course_id}", timeout=const.REQUEST_TIMEOUT)
             response.raise_for_status()
             return CourseOut.model_validate(response.json())
         except (requests.exceptions.RequestException, ValidationError) as e:
@@ -51,7 +54,7 @@ class CourseService(CourseServiceInterface):
             response = requests.post(
                 self.api_url,
                 json=payload.model_dump(by_alias=True, exclude_none=True),
-                timeout=30,
+                timeout=const.REQUEST_TIMEOUT,
             )
             response.raise_for_status()
             return CourseOut.model_validate(response.json())
@@ -62,7 +65,7 @@ class CourseService(CourseServiceInterface):
     def delete_course(self, course_id: str) -> None:
         """Delete a course by ID from the backend."""
         try:
-            response = requests.delete(f"{self.api_url}/{course_id}", timeout=30)
+            response = requests.delete(f"{self.api_url}/{course_id}", timeout=const.REQUEST_TIMEOUT)
             response.raise_for_status()
         except requests.exceptions.RequestException as e:
             msg = f"Failed to delete course: {e!s}"

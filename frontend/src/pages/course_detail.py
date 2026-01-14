@@ -1,12 +1,10 @@
+"""Course detail page for viewing and managing individual courses."""
+
 import streamlit as st
 
+import constants as const
 from services.course_service import CourseService, CourseServiceError
-from utils.error_handler import (
-    handle_backend_unavailable,
-    handle_delete_course,
-    handle_no_courses_available,
-    handle_service_error,
-)
+from utils import error_handler
 
 st.set_page_config(
     page_title="Course Details - CS50 Moodle Bridge",
@@ -18,17 +16,14 @@ course_service = CourseService()
 
 st.title("📖 Course Details")
 
-if "selected_course_id" not in st.session_state:
-    st.session_state.selected_course_id = None
-
 try:
     all_courses = course_service.get_courses()
 except CourseServiceError as e:
-    handle_service_error(e, "load courses")
+    error_handler.handle_service_error(e, "load courses")
     st.stop()
 
 if not all_courses:
-    handle_no_courses_available()
+    error_handler.handle_no_courses_available()
 
 course_options = {f"{course.name} (...{course.id[-4:]})": course.id for course in all_courses}
 course_display_names = list(course_options.keys())
@@ -43,7 +38,7 @@ selected_course_display = st.selectbox(
 course_id = course_options[selected_course_display] if selected_course_display else None
 
 if not course_id:
-    st.info("Please select a course from the dropdown above.")
+    st.info(const.MESSAGE_SELECT_COURSE)
     st.stop()
 
 try:
@@ -53,12 +48,16 @@ try:
     with col1:
         st.header(course.name)
     with col2:
-        if st.button("← Back", use_container_width=True):
-            st.switch_page("app.py")
+        if st.button(const.BUTTON_BACK, use_container_width=True):
+            st.switch_page(const.HOME_PAGE)
 
     st.divider()
 
-    tab1, tab2, tab3 = st.tabs(["📋 Overview", "🎯 Exercises", "⚙️ Settings"])
+    tab1, tab2, tab3 = st.tabs([
+        f"{const.ICON_INFO} Overview",
+        f"{const.ICON_TARGET} Exercises",
+        f"{const.ICON_SETTINGS} Settings",
+    ])
 
     with tab1:
         st.subheader("Course Overview")
@@ -121,12 +120,12 @@ try:
 
             st.divider()
 
-            if st.button("📋 Copy All Exercise IDs", use_container_width=True):
+            if st.button(const.BUTTON_COPY_EXERCISE_IDS, use_container_width=True):
                 exercise_list = "\n".join(course.exercise_ids)
                 st.code(exercise_list, language=None)
-                st.success("Exercise IDs displayed above - copy them from the code block")
+                st.success(const.MESSAGE_EXERCISE_IDS_COPIED)
         else:
-            st.info("No exercises have been added to this course yet.")
+            st.info(const.MESSAGE_NO_EXERCISES)
             st.markdown("""
             **To add exercises:**
             - Use the API to add exercise IDs to this course
@@ -159,24 +158,28 @@ try:
 
             with col1:
                 update_button = st.form_submit_button(
-                    "💾 Update Course", type="primary", use_container_width=True
+                    const.BUTTON_UPDATE_COURSE, type="primary", use_container_width=True
                 )
 
             with col2:
-                refresh_button = st.form_submit_button("🔄 Refresh", use_container_width=True)
+                refresh_button = st.form_submit_button(
+                    const.BUTTON_REFRESH, use_container_width=True
+                )
 
             with col3:
-                delete_button = st.form_submit_button("🗑️ Delete Course", use_container_width=True)
+                delete_button = st.form_submit_button(
+                    const.BUTTON_DELETE_COURSE, use_container_width=True
+                )
 
             if update_button:
-                st.info("Update functionality coming soon!")
-                st.caption("This feature will allow you to modify course details.")
+                st.info(const.MESSAGE_UPDATE_COMING_SOON)
+                st.caption(const.MESSAGE_UPDATE_FEATURE_DESCRIPTION)
 
             if refresh_button:
                 st.rerun()
 
             if delete_button:
-                handle_delete_course(course_service, course_id, course.name)
+                error_handler.handle_delete_course(course_service, course_id, course.name)
 
         st.divider()
 
@@ -185,5 +188,5 @@ try:
             st.json(course.model_dump(mode="json"))
 
 except CourseServiceError as e:
-    handle_service_error(e, "load course")
-    handle_backend_unavailable(redirect_page="app.py")
+    error_handler.handle_service_error(e, "load course")
+    error_handler.handle_backend_unavailable(redirect_page=const.HOME_PAGE)

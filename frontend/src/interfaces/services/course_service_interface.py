@@ -1,3 +1,5 @@
+"""Interface definition for course service implementations."""
+
 from abc import ABC, abstractmethod
 
 from models.course import CourseCreate, CourseOut

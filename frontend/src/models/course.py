@@ -1,3 +1,5 @@
+"""Pydantic models for course data structures."""
+
 from typing import Any
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field

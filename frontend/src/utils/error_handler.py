@@ -7,6 +7,7 @@ from typing import NoReturn
 
 import streamlit as st
 
+import constants as const
 from services.course_service import CourseService, CourseServiceError
 
 logger = logging.getLogger(__name__)
@@ -29,7 +30,7 @@ def handle_service_error(
         st.caption("💡 Try refreshing the page or checking your connection.")
 
 
-def handle_no_courses_available(redirect_page: str = "home.py") -> NoReturn:
+def handle_no_courses_available(redirect_page: str = const.HOME_PAGE) -> NoReturn:
     """Handle the case when no courses are available.
 
     Args:
@@ -39,7 +40,7 @@ def handle_no_courses_available(redirect_page: str = "home.py") -> NoReturn:
         st.stop: Always stops execution after displaying the message
     """
     st.warning("No courses available. Please create a course first.")
-    if st.button("← Go to Courses", type="primary"):
+    if st.button(const.BUTTON_GO_TO_COURSES, type="primary"):
         st.switch_page(redirect_page)
     st.stop()
 
@@ -53,10 +54,10 @@ def handle_backend_unavailable(redirect_page: str | None = None) -> NoReturn:
     Raises:
         st.stop: Always stops execution after displaying the message
     """
-    st.error("Unable to connect to the backend service.")
-    st.info("Make sure the backend is running and accessible.")
+    st.error(const.MESSAGE_BACKEND_UNAVAILABLE)
+    st.info(const.MESSAGE_BACKEND_CHECK)
 
-    if redirect_page and st.button("← Back to Courses", type="primary"):
+    if redirect_page and st.button(const.BUTTON_BACK_TO_COURSES, type="primary"):
         st.switch_page(redirect_page)
 
     st.stop()
@@ -66,14 +67,14 @@ def handle_delete_course(
     course_service: CourseService,
     course_id: str,
     course_name: str,
-    redirect_page: str = "app.py",
+    redirect_page: str = const.HOME_PAGE,
 ) -> None:
     """Handle course deletion with success/error messaging and redirection."""
     try:
         course_service.delete_course(course_id)
         st.success(f"Course '{course_name}' has been successfully deleted!")
-        st.info("Redirecting to home page...")
-        time.sleep(1.5)
+        st.info(const.MESSAGE_REDIRECTING)
+        time.sleep(const.DELETE_REDIRECT_DELAY)
     except CourseServiceError as e:
         logger.exception("Failed to delete course %s", course_id)
         st.error(f"Failed to delete course: {e!s}")
@@ -89,7 +90,10 @@ def handle_delete_course(
     st.switch_page(redirect_page)
 
 
-def with_retry(max_attempts: int = 3, delay: float = 1.0):
+def with_retry(
+    max_attempts: int = const.DEFAULT_MAX_RETRY_ATTEMPTS,
+    delay: float = const.DEFAULT_RETRY_DELAY,
+):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
