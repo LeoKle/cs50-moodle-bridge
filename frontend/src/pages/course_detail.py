@@ -30,17 +30,17 @@ except CourseServiceError as e:
 if not all_courses:
     handle_no_courses_available()
 
-course_options = {course.name: course.id for course in all_courses}
-course_names = list(course_options.keys())
+course_options = {f"{course.name} (...{course.id[-4:]})": course.id for course in all_courses}
+course_display_names = list(course_options.keys())
 
-selected_course_name = st.selectbox(
+selected_course_display = st.selectbox(
     "Select a course to view details:",
-    options=course_names,
-    index=0 if course_names else None,
+    options=course_display_names,
+    index=0 if course_display_names else None,
     help="Choose a course from the dropdown to view its details",
 )
 
-course_id = course_options[selected_course_name] if selected_course_name else None
+course_id = course_options[selected_course_display] if selected_course_display else None
 
 if not course_id:
     st.info("Please select a course from the dropdown above.")

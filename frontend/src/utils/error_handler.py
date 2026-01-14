@@ -6,6 +6,7 @@ from functools import wraps
 from typing import NoReturn
 
 import streamlit as st
+
 from services.course_service import CourseService, CourseServiceError
 
 logger = logging.getLogger(__name__)
@@ -79,8 +80,8 @@ def handle_delete_course(
         st.caption("Please try again or check the backend connection.")
         return
     except (KeyboardInterrupt, SystemExit):
-        raise  # Don't catch system exits
-    except BaseException:  # More explicit than Exception
+        raise
+    except BaseException:
         logger.exception("Unexpected error deleting course %s", course_id)
         st.error("An unexpected error occurred. Please try again.")
         return
@@ -100,11 +101,8 @@ def with_retry(max_attempts: int = 3, delay: float = 1.0):
                     last_exception = e
                     if attempt == max_attempts - 1:
                         raise
-                    logger.warning(
-                        "Retry attempt %d/%d failed", attempt + 1, max_attempts
-                    )
+                    logger.warning("Retry attempt %d/%d failed", attempt + 1, max_attempts)
                     time.sleep(delay)
-            # This should never be reached, but just in case
             if last_exception:
                 raise last_exception
 

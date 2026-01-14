@@ -36,7 +36,7 @@ class CourseOut(BaseModel):
     cs50_id: int | None = None
     exercise_ids: list[str] = []
 
-    model_config = ConfigDict(populate_by_name=True)  # Allows using both id and _id
+    model_config = ConfigDict(populate_by_name=True)
 
     def __getitem__(self, item: str) -> Any:
         return self.model_dump().get(item)
@@ -44,7 +44,7 @@ class CourseOut(BaseModel):
     def __contains__(self, item: object) -> bool:
         return bool(isinstance(item, str) and item in self.model_dump())
 
-    def __eq__(self, other: object) -> bool:  # pragma: no cover - comparison helper
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, CourseOut):
             return super().__eq__(other)
         if isinstance(other, dict):

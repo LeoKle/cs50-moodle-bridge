@@ -51,7 +51,6 @@ def render_course_list(courses: list[CourseOut]) -> None:
         st.info("No courses available yet.")
         return
 
-    # Initialize session state for expanded course
     if "expanded_course_id" not in st.session_state:
         st.session_state.expanded_course_id = None
 
@@ -86,7 +85,6 @@ def render_course_list(courses: list[CourseOut]) -> None:
             with col2:
                 st.markdown(f"**{course_name}**")
 
-                # Show quick info
                 info_parts = []
                 if cs50_id:
                     info_parts.append(f"CS50 ID: {cs50_id}")
@@ -94,7 +92,6 @@ def render_course_list(courses: list[CourseOut]) -> None:
                 st.caption(" • ".join(info_parts))
 
             with col3:
-                # Toggle button to expand/collapse details
                 is_expanded = st.session_state.expanded_course_id == course_id
                 if st.button(
                     "Hide Details" if is_expanded else "View Details",
@@ -108,7 +105,6 @@ def render_course_list(courses: list[CourseOut]) -> None:
                         st.session_state.expanded_course_id = course_id
                     st.rerun()
 
-            # Show details if expanded
             if st.session_state.expanded_course_id == course_id:
                 st.divider()
 
