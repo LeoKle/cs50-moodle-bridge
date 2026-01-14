@@ -23,4 +23,4 @@ try:
     courses = course_service.get_courses()
     render_course_list(courses)
 except CourseServiceError as e:
-    error_handler.handle_service_error(e, "load courses")
+    error_handler.handle_error_service(e, "load courses")

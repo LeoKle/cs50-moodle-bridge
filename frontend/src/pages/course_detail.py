@@ -19,11 +19,11 @@ st.title("📖 Course Details")
 try:
     all_courses = course_service.get_courses()
 except CourseServiceError as e:
-    error_handler.handle_service_error(e, "load courses")
+    error_handler.handle_error_service(e, "load courses")
     st.stop()
 
 if not all_courses:
-    error_handler.handle_no_courses_available()
+    error_handler.handle_error_no_courses()
 
 course_options = {f"{course.name} (...{course.id[-4:]})": course.id for course in all_courses}
 course_display_names = list(course_options.keys())
@@ -179,7 +179,7 @@ try:
                 st.rerun()
 
             if delete_button:
-                error_handler.handle_delete_course(course_service, course_id, course.name)
+                error_handler.handle_action_delete_course(course_service, course_id, course.name)
 
         st.divider()
 
@@ -188,5 +188,5 @@ try:
             st.json(course.model_dump(mode="json"))
 
 except CourseServiceError as e:
-    error_handler.handle_service_error(e, "load course")
-    error_handler.handle_backend_unavailable(redirect_page=const.HOME_PAGE)
+    error_handler.handle_error_service(e, "load course")
+    error_handler.handle_error_backend_unavailable(redirect_page=const.HOME_PAGE)

@@ -2,7 +2,6 @@
 
 import logging
 import time
-from functools import wraps
 from typing import NoReturn
 
 import streamlit as st
@@ -13,7 +12,7 @@ from services.course_service import CourseService, CourseServiceError
 logger = logging.getLogger(__name__)
 
 
-def handle_service_error(
+def handle_error_service(
     error: CourseServiceError, context: str = "operation", show_retry_hint: bool = True
 ) -> None:
     """Handle CourseServiceError
@@ -30,7 +29,7 @@ def handle_service_error(
         st.caption("💡 Try refreshing the page or checking your connection.")
 
 
-def handle_no_courses_available(redirect_page: str = const.HOME_PAGE) -> NoReturn:
+def handle_error_no_courses(redirect_page: str = const.HOME_PAGE) -> NoReturn:
     """Handle the case when no courses are available.
 
     Args:
@@ -45,7 +44,7 @@ def handle_no_courses_available(redirect_page: str = const.HOME_PAGE) -> NoRetur
     st.stop()
 
 
-def handle_backend_unavailable(redirect_page: str | None = None) -> NoReturn:
+def handle_error_backend_unavailable(redirect_page: str | None = None) -> NoReturn:
     """Handle backend unavailability with option to redirect.
 
     Args:
@@ -63,7 +62,7 @@ def handle_backend_unavailable(redirect_page: str | None = None) -> NoReturn:
     st.stop()
 
 
-def handle_delete_course(
+def handle_action_delete_course(
     course_service: CourseService,
     course_id: str,
     course_name: str,
@@ -88,28 +87,3 @@ def handle_delete_course(
         return
 
     st.switch_page(redirect_page)
-
-
-def with_retry(
-    max_attempts: int = const.DEFAULT_MAX_RETRY_ATTEMPTS,
-    delay: float = const.DEFAULT_RETRY_DELAY,
-):
-    def decorator(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            last_exception = None
-            for attempt in range(max_attempts):
-                try:
-                    return func(*args, **kwargs)
-                except CourseServiceError as e:
-                    last_exception = e
-                    if attempt == max_attempts - 1:
-                        raise
-                    logger.warning("Retry attempt %d/%d failed", attempt + 1, max_attempts)
-                    time.sleep(delay)
-            if last_exception:
-                raise last_exception
-
-        return wrapper
-
-    return decorator
