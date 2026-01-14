@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 
-from .controllers import course
+from .controllers import course, cs50_submission_problem
 
 router = APIRouter(prefix="/v1")
 
 router.include_router(course.router)
+router.include_router(cs50_submission_problem.router)
