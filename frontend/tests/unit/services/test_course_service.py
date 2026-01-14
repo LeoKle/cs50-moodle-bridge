@@ -55,7 +55,10 @@ def test_get_courses_returns_list_on_success(course_service, mock_response):
 
 def test_get_courses_raises_exception_on_request_failure(course_service):
     """Test get_courses raises exception when request fails."""
-    with patch("requests.get", side_effect=requests.exceptions.ConnectionError("Connection error")):
+    with patch(
+        "requests.get",
+        side_effect=requests.exceptions.ConnectionError("Connection error"),
+    ):
         with pytest.raises(Exception) as exc_info:
             course_service.get_courses()
 
@@ -75,7 +78,12 @@ def test_get_courses_raises_exception_on_http_error(course_service, mock_respons
 
 def test_get_course_returns_course_on_success(course_service, mock_response):
     """Test get_course returns a single course on successful response."""
-    mock_course = {"id": "123", "name": "Test Course", "cs50_id": 50, "exercise_ids": []}
+    mock_course = {
+        "id": "123",
+        "name": "Test Course",
+        "cs50_id": 50,
+        "exercise_ids": [],
+    }
     mock_response.json.return_value = mock_course
 
     with patch("requests.get", return_value=mock_response) as mock_get:
@@ -131,7 +139,9 @@ def test_create_course_with_name_and_cs50_id(course_service, mock_response):
         result = course_service.create_course("New Course", cs50_id=100)
 
         mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course", "cs50_id": 100}, timeout=30
+            course_service.api_url,
+            json={"name": "New Course", "cs50_id": 100},
+            timeout=30,
         )
         assert result == mock_course
         assert result["cs50_id"] == 100
@@ -169,3 +179,35 @@ def test_create_course_raises_exception_on_http_error(course_service, mock_respo
             course_service.create_course("New Course")
 
         assert "Failed to create course" in str(exc_info.value)
+
+
+def test_delete_course_success(course_service, mock_response):
+    """Test delete_course successfully deletes a course."""
+    with patch("requests.delete", return_value=mock_response) as mock_delete:
+        course_service.delete_course("123")
+
+        mock_delete.assert_called_once_with(f"{course_service.api_url}/123", timeout=30)
+        mock_response.raise_for_status.assert_called_once()
+
+
+def test_delete_course_raises_exception_on_request_failure(course_service):
+    """Test delete_course raises exception when request fails."""
+    with patch(
+        "requests.delete",
+        side_effect=requests.exceptions.ConnectionError("Connection error"),
+    ):
+        with pytest.raises(Exception) as exc_info:
+            course_service.delete_course("123")
+
+        assert "Failed to delete course" in str(exc_info.value)
+
+
+def test_delete_course_raises_exception_on_http_error(course_service, mock_response):
+    """Test delete_course raises exception on HTTP error."""
+    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Not Found")
+
+    with patch("requests.delete", return_value=mock_response):
+        with pytest.raises(Exception) as exc_info:
+            course_service.delete_course("123")
+
+        assert "Failed to delete course" in str(exc_info.value)

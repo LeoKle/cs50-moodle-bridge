@@ -58,3 +58,12 @@ class CourseService(CourseServiceInterface):
         except (requests.exceptions.RequestException, ValidationError) as e:
             msg = f"Failed to create course: {e!s}"
             raise CourseServiceError(msg) from e
+
+    def delete_course(self, course_id: str) -> None:
+        """Delete a course by ID from the backend."""
+        try:
+            response = requests.delete(f"{self.api_url}/{course_id}", timeout=30)
+            response.raise_for_status()
+        except requests.exceptions.RequestException as e:
+            msg = f"Failed to delete course: {e!s}"
+            raise CourseServiceError(msg) from e

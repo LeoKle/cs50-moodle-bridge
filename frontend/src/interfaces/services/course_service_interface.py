@@ -14,3 +14,6 @@ class CourseServiceInterface(ABC):
     def create_course(
         self, course: CourseCreate | str, cs50_id: int | None = None
     ) -> CourseOut: ...
+
+    @abstractmethod
+    def delete_course(self, course_id: str) -> None: ...

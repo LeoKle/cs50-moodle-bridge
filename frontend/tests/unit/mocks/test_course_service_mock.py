@@ -90,3 +90,34 @@ def test_reset_resets_id_counter(mock_service):
     course2 = mock_service.create_course("Course 2")
 
     assert course1["id"] == course2["id"] == "1"
+
+
+def test_delete_course_removes_course(mock_service):
+    """Test that delete_course removes a course from the mock data."""
+    course = mock_service.create_course("Test Course", cs50_id=50)
+    course_id = course["id"]
+
+    mock_service.delete_course(course_id)
+
+    assert mock_service.get_courses() == []
+
+
+def test_delete_course_raises_exception_for_nonexistent_id(mock_service):
+    """Test that delete_course raises exception for non-existent ID."""
+    with pytest.raises(Exception) as exc_info:
+        mock_service.delete_course("nonexistent")
+
+    assert "not found" in str(exc_info.value)
+
+
+def test_delete_course_removes_specific_course(mock_service):
+    """Test that delete_course removes only the specified course."""
+    course1 = mock_service.create_course("Course 1", cs50_id=10)
+    course2 = mock_service.create_course("Course 2", cs50_id=20)
+
+    mock_service.delete_course(course1["id"])
+
+    courses = mock_service.get_courses()
+    assert len(courses) == 1
+    assert courses[0]["id"] == course2["id"]
+    assert courses[0]["name"] == "Course 2"

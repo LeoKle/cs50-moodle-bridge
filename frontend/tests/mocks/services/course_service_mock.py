@@ -44,6 +44,13 @@ class MockCourseService(CourseServiceInterface):
         self._data[course_id] = course_out
         return course_out
 
+    def delete_course(self, course_id: str) -> None:
+        """Delete a course by ID."""
+        if course_id not in self._data:
+            msg = f"Course with id {course_id} not found"
+            raise CourseServiceMockError(msg)
+        del self._data[course_id]
+
     def reset(self) -> None:
         """Reset the mock data."""
         self._data.clear()

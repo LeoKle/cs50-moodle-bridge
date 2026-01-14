@@ -3,7 +3,7 @@
 ## run Project
 
 1. in folder **cs50-moodle-bridge** run ```docker-compose -f docker-compose.dev.yml up -d```
-2. in folder **frontend** run ```uv run streamlit run src/pages/app.py```
+2. in folder **frontend** run ```uv run streamlit run src/app.py```
 
 ## Frontend Testing
 

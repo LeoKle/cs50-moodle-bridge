@@ -3,6 +3,7 @@ import streamlit as st
 from services.course_service import CourseService, CourseServiceError
 from utils.error_handler import (
     handle_backend_unavailable,
+    handle_delete_course,
     handle_no_courses_available,
     handle_service_error,
 )
@@ -175,8 +176,7 @@ try:
                 st.rerun()
 
             if delete_button:
-                st.error("Delete functionality coming soon!")
-                st.caption("This feature will allow you to remove courses.")
+                handle_delete_course(course_service, course_id, course.name)
 
         st.divider()
 
