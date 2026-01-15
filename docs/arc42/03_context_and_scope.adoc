@@ -3,6 +3,9 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-context-and-scope]]
 == Context and Scope
 
+* The system acts as an intermediary between CS50 and Moodle.
+* It fetches submission data from CS50 and updates grades in Moodle.
+* Direct communication between CS50 and Moodle does not exist.
 
 ifdef::arc42help[]
 [role="arc42help"]

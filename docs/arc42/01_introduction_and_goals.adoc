@@ -89,7 +89,7 @@ endif::arc42help[]
 |Synchronization operations complete within acceptable timeframes (< 5 seconds per operation)
 
 |Maintainability
-|Code is well-documented and structured for future enhancements by development teams
+|Easy to extend for new CS50 courses
 
 |Security
 |User credentials and course data are encrypted and securely transmitted between systems
@@ -105,6 +105,9 @@ endif::arc42help[]
 
 |Scalability
 |The system can handle growing numbers of students and assignments (e.g. several hundred students per course) without noticeable slowdown
+
+|Correctness
+|CS50 results must map exactly to Moodle grades
 |===
 
 === Stakeholders

@@ -32,3 +32,35 @@ See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentat
 
 ****
 endif::arc42help[]
+
+=== Overall Strategy
+
+The system follows a layered architecture:
+
+* API layer for HTTP communication
+* Application logic layer for grading and data processing
+* Integration layer for external systems (CS50, Moodle, GitHub)
+* Persistence layer for storing submissions and results
+
+=== Communication Strategy
+
+All communication is performed via REST-based HTTP APIs.
+
+* CS50 data is imported via file upload or API-based export
+* Moodle is updated by exporting structured grading data
+* The backend exposes JSON-based endpoints for the web UI
+
+=== Integration Strategy
+
+External systems are accessed through dedicated adapter components.
+
+* CS50 integration handles submission data import
+* Moodle integration handles grade export
+* GitHub integration resolves student identities
+
+=== Persistence Strategy
+
+Submissions and grading results are stored using a repository abstraction.
+
+* Domain logic depends only on repository interfaces
+* The concrete database technology can be changed without affecting business logic

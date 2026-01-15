@@ -35,3 +35,171 @@ There you will find links and examples about ADR.
 
 ****
 endif::arc42help[]
+
+=== Use of a Layered Architecture
+
+*Context:*  
+The system must integrate multiple external systems while remaining
+maintainable and easy to extend.
+
+*Decision:*  
+The application is structured into clearly separated layers:
+API layer, application services, integration components, and persistence.
+
+*Consequences:*  
+
+* Clear separation of responsibilities
+* Improved maintainability and testability
+* Slight increase in structural complexity
+
+=== REST-Based API Communication
+
+*Context:*  
+The system must be accessible from different clients and integrate
+with external platforms.
+
+*Decision:*  
+All internal and external communication is performed using
+REST-based HTTP APIs with JSON payloads.
+
+*Consequences:*  
+
+* High interoperability
+* Easy debugging and testing
+* Requires careful versioning of endpoints
+
+=== Repository Pattern for Persistence
+
+*Context:*  
+The persistence mechanism may change in the future.
+
+*Decision:*  
+All data access is abstracted using repository interfaces.
+Application services depend only on these interfaces.
+
+*Consequences:*  
+
+* Database technology can be replaced with minimal impact
+* Improved unit testing through mocking
+* Additional abstraction layer required
+
+=== Dedicated Integration Adapters
+
+*Context:*  
+External systems such as CS50, Moodle, and GitHub have different
+interfaces and change independently.
+
+*Decision:*  
+Each external system is accessed through a dedicated integration
+adapter component.
+
+*Consequences:*  
+
+* Reduced coupling to external APIs
+* Clear ownership of integration logic
+* Additional implementation effort
+
+=== Stateless Backend Design
+
+*Context:*  
+The system should be scalable and robust.
+
+*Decision:*  
+The backend service is designed to be stateless with respect to
+client sessions.
+
+*Consequences:*  
+
+* Horizontal scaling is possible
+* Simplified deployment and recovery
+* Client state must be managed externally
+
+=== External Configuration Management
+
+*Context:*  
+Sensitive credentials and configuration values must be protected.
+
+*Decision:*  
+Configuration values are managed outside the application code,
+for example via environment variables.
+
+*Consequences:*  
+
+* Improved security
+* Easier configuration across environments
+* Requires proper deployment configuration
+
+=== Use of a Modular Monolithic Architecture
+
+*Context:*  
+This Application integrates several closely related functionalities such as student import, enrollment, submission processing, grading, and grade export. 
+These functions share the same domain data and are typically executed as part of a single workflow.
+
+*Decision:*  
+The system is implemented as a modular monolithic service rather than a microservices-based architecture. 
+Logical separation is achieved through clear module boundaries within a single deployable application.
+
+*Consequences:*  
+
+* Reduced architectural and operational complexity
+* Easier development, testing, and deployment
+* No need for distributed communication, service discovery, or inter-service APIs
+* Simplified data consistency and transaction handling
+* The architecture remains flexible enough to extract services later if required
+
+=== Use of Python (FastAPI) for Backend Implementation
+
+*Context:*  
+This Application focuses on data import, validation, transformation, grading, and integration with external systems such as CS50, Moodle, and GitHub. 
+The implementation must be readable, maintainable, and easy to test in an academic environment.
+
+*Decision:*  
+Python is used as the primary programming language for the backend,
+together with the FastAPI framework for building REST-based APIs.
+
+*Consequences:*  
+
+* Fast development and high code readability
+* Strong support for data validation and transformation
+* Excellent ecosystem for HTTP APIs and external integrations
+* Easy implementation of automated tests
+* Performance is sufficient for the expected number of students and submissions
+
+=== Use of Mocks for Testing External Dependencies
+
+*Context:*  
+The system integrates with external services such as CS50, Moodle, and GitHub. 
+These services are not always available and may change their behavior or data.
+
+*Decision:*  
+Mocks are used in automated tests to simulate external systems and isolate the application logic from real network communication.
+
+*Consequences:*  
+
+* Tests are deterministic and repeatable
+* No dependency on external systems or credentials during testing
+* Faster test execution
+* Business logic can be tested in isolation
+* Additional effort is required to maintain mock implementations
+
+=== Separation into Models, Services, Interfaces, and Integration Components
+
+*Context:*  
+The system contains domain logic, persistence logic, and integration logic with multiple external systems. 
+These concerns evolve at different speeds and must be isolated to keep the system maintainable.
+
+*Decision:*  
+The codebase is structured into separate layers and folders:
+* Models for domain data
+* Services for business logic
+* Interfaces for abstractions
+* Repositories for persistence implementations
+* Resolvers for external system integration
+
+*Consequences:*  
+
+* Clear separation of responsibilities
+* Improved readability and maintainability
+* Easier unit testing through interface-based mocking
+* External changes are isolated from core business logic
+* Slightly increased initial design effort
