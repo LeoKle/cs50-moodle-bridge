@@ -62,6 +62,12 @@ classDiagram
     }
     IStudentService ..> IStudentRepository
 
+    class IGitHubService {
+        import_github_names(course_id, file)
+    }
+    IGitHubService ..> IStudentRepository
+    IGitHubService ..> IGitHubClientResolver
+
     class ICS50SubmissionProblemRepository {
         upload_submissions()
         get_submissions()
@@ -112,8 +118,3 @@ classDiagram
     %% class IStudentRepository
     %% IStudentService ..> IStudentRepository
     %% StudentController ..> IStudentService
-
-    class IGitHubService {
-        import_github_names(course_id, file)
-    }
-    IGitHubService ..> IStudentRepository
