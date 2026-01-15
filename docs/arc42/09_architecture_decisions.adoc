@@ -44,7 +44,7 @@ maintainable and easy to extend.
 
 *Decision:*  
 The application is structured into clearly separated layers:
-API layer, application services, integration components, and persistence.
+API layer, application services and persistence.
 
 *Consequences:*  
 
