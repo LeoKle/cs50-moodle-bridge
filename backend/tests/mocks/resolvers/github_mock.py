@@ -2,6 +2,16 @@ from typing import Any
 
 import requests
 
+from interfaces.resolver.github_client_resolver import IGitHubClientResolver
+
+
+class MockGitHubClientResolver(IGitHubClientResolver):
+    def __init__(self, users: dict[str, int]):
+        self._users = users
+
+    def get_user_id(self, username: str) -> int | None:
+        return self._users.get(username)
+
 
 class MockGitHubResponse:
     def __init__(self, *, status_code: int, json_data: dict[str, Any] | None = None) -> None:

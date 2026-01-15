@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from .controllers import course, cs50_submission_problem, enrollment
+from .controllers import course, enrollment
 
 router = APIRouter(prefix="/v1")
 

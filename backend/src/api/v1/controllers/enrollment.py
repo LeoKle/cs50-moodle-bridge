@@ -10,7 +10,7 @@ from interfaces.services.enrollment_service import IEnrollmentService
 router = APIRouter(prefix="/enroll", tags=["enrollment"])
 
 
-@router.get("")
+@router.post("/{course_id}")
 @inject
 def import_students_from_csv(
     course_id: str,
