@@ -2,8 +2,9 @@
 
 import streamlit as st
 
-import constants as const
-from services.course_service import CourseService, CourseServiceError
+from containers import container
+from services.course_service import CourseServiceError
+from services.enrollment_service import EnrollmentServiceError
 from utils import error_handler
 
 st.set_page_config(
@@ -12,7 +13,8 @@ st.set_page_config(
     layout="wide",
 )
 
-course_service = CourseService()
+course_service = container.course_service()
+enrollment_service = container.enrollment_service()
 
 st.title("📖 Course Details")
 
@@ -38,25 +40,18 @@ selected_course_display = st.selectbox(
 course_id = course_options[selected_course_display] if selected_course_display else None
 
 if not course_id:
-    st.info(const.MESSAGE_SELECT_COURSE)
+    st.info("Please select a course from the dropdown above.")
     st.stop()
 
 try:
     course = course_service.get_course(course_id)
+    st.header(f"Course: {course.name}")
 
-    col1, col2 = st.columns([0.85, 0.15])
-    with col1:
-        st.header(course.name)
-    with col2:
-        if st.button(const.BUTTON_BACK, use_container_width=True):
-            st.switch_page(const.HOME_PAGE)
-
-    st.divider()
-
-    tab1, tab2, tab3 = st.tabs([
-        f"{const.ICON_INFO} Overview",
-        f"{const.ICON_TARGET} Exercises",
-        f"{const.ICON_SETTINGS} Settings",
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📋 Overview",
+        "🎯 Exercises",
+        "👥 Students",
+        "⚙️ Settings",
     ])
 
     with tab1:
@@ -120,12 +115,12 @@ try:
 
             st.divider()
 
-            if st.button(const.BUTTON_COPY_EXERCISE_IDS, use_container_width=True):
+            if st.button("📋 Copy All Exercise IDs", use_container_width=True):
                 exercise_list = "\n".join(course.exercise_ids)
                 st.code(exercise_list, language=None)
-                st.success(const.MESSAGE_EXERCISE_IDS_COPIED)
+                st.success("Exercise IDs displayed above - copy them from the code block")
         else:
-            st.info(const.MESSAGE_NO_EXERCISES)
+            st.info("No exercises have been added to this course yet.")
             st.markdown("""
             **To add exercises:**
             - Use the API to add exercise IDs to this course
@@ -133,6 +128,60 @@ try:
             """)
 
     with tab3:
+        st.subheader("Student Enrollment")
+
+        uploaded_file = st.file_uploader(
+            "Choose a CSV file",
+            type=["csv"],
+            help="Upload a CSV file with student enrollment data",
+            accept_multiple_files=False,
+        )
+
+        if uploaded_file is not None:
+            # Display file information
+            st.info(f"📄 File selected: **{uploaded_file.name}** ({uploaded_file.size} bytes)")
+
+            # Validate file type
+            if not uploaded_file.name.endswith(".csv"):
+                st.error("⚠️ Invalid file type. Please upload a CSV file.")
+            else:
+                col1, col2 = st.columns([0.3, 0.7])
+
+                with col1:
+                    if st.button(
+                        "📤 Upload CSV",
+                        type="primary",
+                        use_container_width=True,
+                    ):
+                        try:
+                            with st.spinner("Uploading and processing CSV..."):
+                                # Upload the file using the enrollment service
+                                result = enrollment_service.upload_enrollment_csv(
+                                    course_id=course_id,
+                                    file=uploaded_file,
+                                )
+
+                            # Display success message with details
+                            st.success("✅ Students enrolled successfully!")
+
+                            # Show enrollment results if available
+                            if result:
+                                st.json(result)
+
+                        except EnrollmentServiceError as e:
+                            st.error(f"❌ Failed to upload CSV file: {e!s}")
+        else:
+            st.info("⚠️ Please select a CSV file to upload.")
+
+        st.divider()
+
+        with st.expander("View Sample CSV Format"):
+            sample_csv = """Vorname,Nachname,E-Mail-Adresse
+Max,Mustermann,max.mustermann@example.com
+Erika,Musterfrau,erika.musterfrau@example.com"""
+            st.code(sample_csv, language="csv")
+
+    with tab4:
         st.subheader("Course Settings")
 
         st.markdown("### Course Information")
@@ -154,39 +203,23 @@ try:
 
             st.divider()
 
-            col1, col2, col3 = st.columns(3)
+            col1, col2 = st.columns(2)
 
             with col1:
                 update_button = st.form_submit_button(
-                    const.BUTTON_UPDATE_COURSE, type="primary", use_container_width=True
+                    "💾 Update Course", type="primary", use_container_width=True
                 )
 
             with col2:
-                refresh_button = st.form_submit_button(
-                    const.BUTTON_REFRESH, use_container_width=True
-                )
-
-            with col3:
-                delete_button = st.form_submit_button(
-                    const.BUTTON_DELETE_COURSE, use_container_width=True
-                )
+                delete_button = st.form_submit_button("🗑️ Delete Course", use_container_width=True)
 
             if update_button:
-                st.info(const.MESSAGE_UPDATE_COMING_SOON)
-                st.caption(const.MESSAGE_UPDATE_FEATURE_DESCRIPTION)
-
-            if refresh_button:
-                st.rerun()
+                st.info("Update functionality coming soon!")
+                st.caption("This feature will allow you to modify course details.")
 
             if delete_button:
                 error_handler.handle_action_delete_course(course_service, course_id, course.name)
 
-        st.divider()
-
-        st.markdown("### Advanced")
-        with st.expander("📊 Raw Course Data (JSON)"):
-            st.json(course.model_dump(mode="json"))
-
 except CourseServiceError as e:
     error_handler.handle_error_service(e, "load course")
-    error_handler.handle_error_backend_unavailable(redirect_page=const.HOME_PAGE)
+    error_handler.handle_error_backend_unavailable(redirect_page="app.py")

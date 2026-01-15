@@ -3,7 +3,6 @@
 import streamlit as st
 from streamlit_extras.stylable_container import stylable_container
 
-import constants as const
 from interfaces.services.course_service_interface import CourseServiceInterface
 from models.course import CourseCreate, CourseOut
 
@@ -13,32 +12,30 @@ def render_add_course_dialog(course_service: CourseServiceInterface) -> None:
     if "show_add_dialog" not in st.session_state:
         st.session_state.show_add_dialog = False
 
-    if st.button(const.BUTTON_ADD_COURSE, type="primary", use_container_width=True):
+    if st.button("➕ Add Course", type="primary", use_container_width=True):  # noqa: RUF001
         st.session_state.show_add_dialog = True
 
     if st.session_state.show_add_dialog:
         with st.form("add_course_form", clear_on_submit=True):
             st.subheader("Add New Course")
 
-            course_name = st.text_input("Course Name*", placeholder=const.PLACEHOLDER_COURSE_NAME)
+            course_name = st.text_input("Course Name*", placeholder="e.g., Introduction-to-CS")
             cs50_id = st.number_input(
                 "CS50 ID (optional)",
-                min_value=const.MIN_CS50_ID,
-                value=const.DEFAULT_CS50_ID,
+                min_value=0,
+                value=0,
                 step=1,
             )
 
             col1, col2 = st.columns(2)
             with col1:
-                submit = st.form_submit_button(
-                    const.BUTTON_CREATE, type="primary", use_container_width=True
-                )
+                submit = st.form_submit_button("Create", type="primary", use_container_width=True)
             with col2:
-                cancel = st.form_submit_button(const.BUTTON_CANCEL, use_container_width=True)
+                cancel = st.form_submit_button("Cancel", use_container_width=True)
 
             if submit:
                 if not course_name or not course_name.strip():
-                    st.error(const.MESSAGE_COURSE_NAME_REQUIRED)
+                    st.error("Course name is required")
                 else:
                     try:
                         cs50_id_value = cs50_id if cs50_id > 0 else None
@@ -58,7 +55,7 @@ def render_add_course_dialog(course_service: CourseServiceInterface) -> None:
 def render_course_list(courses: list[CourseOut]) -> None:
     """Render the list of courses."""
     if not courses:
-        st.info(const.MESSAGE_NO_COURSES)
+        st.info("No courses available yet.")
         return
 
     if "expanded_course_id" not in st.session_state:
@@ -90,7 +87,7 @@ def render_course_list(courses: list[CourseOut]) -> None:
             col1, col2, col3 = st.columns([0.05, 0.75, 0.2])
 
             with col1:
-                st.markdown(const.ICON_BOOK)
+                st.markdown("📖")
 
             with col2:
                 st.markdown(f"**{course_name}**")
@@ -104,7 +101,7 @@ def render_course_list(courses: list[CourseOut]) -> None:
             with col3:
                 is_expanded = st.session_state.expanded_course_id == course_id
                 if st.button(
-                    const.BUTTON_HIDE_DETAILS if is_expanded else const.BUTTON_VIEW_DETAILS,
+                    "Hide Details" if is_expanded else "View Details",
                     key=f"toggle_{course_id}",
                     use_container_width=True,
                     type="primary" if is_expanded else "secondary",

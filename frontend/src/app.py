@@ -2,7 +2,8 @@
 
 import streamlit as st
 
-from services.course_service import CourseService, CourseServiceError
+from containers import container
+from services.course_service import CourseServiceError
 from ui.course_ui import render_add_course_dialog, render_course_list
 from utils import error_handler
 
@@ -11,7 +12,8 @@ st.set_page_config(
     page_icon="📚",
     layout="wide",
 )
-course_service = CourseService()
+
+course_service = container.course_service()
 
 st.title("📚 Courses")
 

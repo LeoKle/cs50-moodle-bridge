@@ -29,7 +29,7 @@ def handle_error_service(
         st.caption("💡 Try refreshing the page or checking your connection.")
 
 
-def handle_error_no_courses(redirect_page: str = const.HOME_PAGE) -> NoReturn:
+def handle_error_no_courses(redirect_page: str = "app.py") -> NoReturn:
     """Handle the case when no courses are available.
 
     Args:
@@ -39,7 +39,7 @@ def handle_error_no_courses(redirect_page: str = const.HOME_PAGE) -> NoReturn:
         st.stop: Always stops execution after displaying the message
     """
     st.warning("No courses available. Please create a course first.")
-    if st.button(const.BUTTON_GO_TO_COURSES, type="primary"):
+    if st.button("← Go to Courses", type="primary"):
         st.switch_page(redirect_page)
     st.stop()
 
@@ -53,10 +53,10 @@ def handle_error_backend_unavailable(redirect_page: str | None = None) -> NoRetu
     Raises:
         st.stop: Always stops execution after displaying the message
     """
-    st.error(const.MESSAGE_BACKEND_UNAVAILABLE)
-    st.info(const.MESSAGE_BACKEND_CHECK)
+    st.error("Unable to connect to the backend service.")
+    st.info("Make sure the backend is running and accessible.")
 
-    if redirect_page and st.button(const.BUTTON_BACK_TO_COURSES, type="primary"):
+    if redirect_page and st.button("← Back to Courses", type="primary"):
         st.switch_page(redirect_page)
 
     st.stop()
@@ -66,13 +66,13 @@ def handle_action_delete_course(
     course_service: CourseService,
     course_id: str,
     course_name: str,
-    redirect_page: str = const.HOME_PAGE,
+    redirect_page: str = "app.py",
 ) -> None:
     """Handle course deletion with success/error messaging and redirection."""
     try:
         course_service.delete_course(course_id)
         st.success(f"Course '{course_name}' has been successfully deleted!")
-        st.info(const.MESSAGE_REDIRECTING)
+        st.info("Redirecting to home page...")
         time.sleep(const.DELETE_REDIRECT_DELAY)
     except CourseServiceError as e:
         logger.exception("Failed to delete course %s", course_id)
