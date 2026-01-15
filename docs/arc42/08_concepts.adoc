@@ -48,18 +48,60 @@ See https://docs.arc42.org/section-8/[Concepts] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== _<Concept 1>_
+=== Domain Model
 
-_<explanation>_
+The system is based on a small set of core domain concepts:
 
+* Course – represents a teaching unit managed by a tutor
+* Student – represents a participant enrolled in a course
+* Enrollment – represents the association between students and courses
+* Submission – represents a CS50 assignment submission
+* Grade – represents the evaluation result of a submission
 
+=== Validation Concept
 
-=== _<Concept 2>_
+All incoming data is validated at the API layer before further processing.
 
-_<explanation>_
+* Request payloads are validated for structure and completeness
+* Invalid data is rejected early with appropriate HTTP status codes
+* Only validated domain objects are passed to application services
 
-...
+=== Error Handling Concept
 
-=== _<Concept n>_
+Errors are handled consistently across the system.
 
-_<explanation>_
+* Client errors result in HTTP 4xx responses
+* Server-side errors result in HTTP 5xx responses
+* Error responses contain a clear message describing the problem
+
+=== Authentication and Authorization Concept
+
+Access to the system is restricted to authorized users.
+
+* Tutors are allowed to manage courses, students, and grading
+* External systems are accessed using secure credentials
+* Authentication details are not exposed to the API clients
+
+=== Integration Concept
+
+External systems are integrated using dedicated adapters.
+
+* CS50 integration handles submission and evaluation data import
+* Moodle integration handles grade export
+* GitHub integration is used optionally to resolve student identities
+
+=== Persistence Concept
+
+Data persistence is abstracted using repository interfaces.
+
+* Application services depend only on repository abstractions
+* Concrete database implementations can be replaced if required
+* Persistence logic is separated from business logic
+
+=== Logging and Traceability Concept
+
+The system provides basic logging for important operations.
+
+* Imports, grading operations, and exports are logged
+* Errors are logged with contextual information
+* Logs support debugging and traceability of grading decisions

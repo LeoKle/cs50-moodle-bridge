@@ -25,3 +25,87 @@ See https://docs.arc42.org/section-11/[Risks and Technical Debt] in the arc42 do
 
 ****
 endif::arc42help[]
+
+=== Changes in External APIs
+
+*Risk:*  
+CS50, Moodle, or GitHub APIs may change their interfaces or data formats.
+
+*Impact:*  
+Importing submissions or exporting grades may fail or produce incorrect results.
+
+*Mitigation:*  
+
+* Use dedicated integration adapters for each external system
+* Validate incoming data strictly
+* Isolate API-specific logic to minimize impact of changes
+
+=== Availability of External Systems
+
+*Risk:*  
+External systems such as Moodle or CS50 may be temporarily unavailable.
+
+*Impact:*  
+Grade import or export operations may fail.
+
+*Mitigation:*  
+
+* Detect and report communication errors clearly
+* Store grading results locally before export
+* Allow retrying failed operations
+
+=== Incorrect Grading Logic
+
+*Risk:*  
+Errors in grading rules may lead to incorrect evaluation results.
+
+*Impact:*  
+Students may receive wrong grades.
+
+*Mitigation:*  
+
+* Keep grading logic isolated in dedicated services
+* Use clear and traceable grading rules
+* Validate grading results before export
+
+=== Data Consistency Issues
+
+*Risk:*  
+Repeated imports or partial failures could lead to inconsistent data.
+
+*Impact:*  
+Grades or submissions may be duplicated or overwritten incorrectly.
+
+*Mitigation:*  
+
+* Use idempotent import and export operations
+* Ensure repeated processing produces identical results
+* Validate data consistency before persistence
+
+=== Security of Credentials
+
+*Risk:*  
+Credentials for CS50, Moodle, or GitHub could be exposed or misused.
+
+*Impact:*  
+Unauthorized access to external systems or sensitive data.
+
+*Mitigation:*  
+
+* Store credentials outside the source code
+* Use environment variables for configuration
+* Restrict access to sensitive configuration files
+
+=== Performance Limitations
+
+*Risk:*  
+Large courses with many students and submissions may degrade performance.
+
+*Impact:*  
+Slow import, grading, or export operations.
+
+*Mitigation:*  
+
+* Use efficient data processing strategies
+* Optimize batch operations
+* Monitor performance during large imports
