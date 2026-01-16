@@ -38,13 +38,19 @@ class EnrollmentService(EnrollmentServiceInterface):
         Raises:
             EnrollmentServiceError: If the upload fails
         """
-        try:
+
+        def _validate_inputs() -> None:
             if not course_id or not course_id.strip():
-                raise ValueError("Course ID cannot be empty")
+                msg = "Course ID cannot be empty"
+                raise ValueError(msg)
 
             if not file:
-                raise ValueError("File is required")
+                msg = "File is required"
+                raise ValueError(msg)
 
+        _validate_inputs()
+
+        try:
             return self._repository.upload_csv(course_id, file)
 
         except Exception as e:

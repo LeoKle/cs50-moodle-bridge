@@ -63,17 +63,21 @@ class CourseService(CourseServiceInterface):
         Returns:
             CourseOut: The created course
         """
-        try:
-            # Convert string to CourseCreate if needed
-            payload = (
-                CourseCreate(name=course, cs50_id=cs50_id)
-                if isinstance(course, str)
-                else CourseCreate.model_validate(course)
-            )
+        # Convert string to CourseCreate if needed
+        payload = (
+            CourseCreate(name=course, cs50_id=cs50_id)
+            if isinstance(course, str)
+            else CourseCreate.model_validate(course)
+        )
 
+        def _validate_course_name() -> None:
             if not payload.name or not payload.name.strip():
-                raise ValueError("Course name cannot be empty")
+                msg = "Course name cannot be empty"
+                raise ValueError(msg)
 
+        _validate_course_name()
+
+        try:
             return self._repository.create(payload)
         except Exception as e:
             msg = f"Failed to create course: {e!s}"
