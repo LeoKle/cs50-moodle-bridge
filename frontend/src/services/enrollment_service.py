@@ -1,10 +1,10 @@
-"""Enrollment service for handling API calls to the backend."""
+"""Enrollment service - business logic for enrollment operations."""
 
-import os
+from typing import Any
 
-import requests
-
-import constants as const
+from interfaces.repositories.enrollment_repository_interface import (
+    EnrollmentRepositoryInterface,
+)
 from interfaces.services.enrollment_service_interface import EnrollmentServiceInterface
 
 
@@ -13,14 +13,18 @@ class EnrollmentServiceError(Exception):
 
 
 class EnrollmentService(EnrollmentServiceInterface):
-    """Service to handle enrollment-related API calls to the backend."""
+    """Production enrollment service using repository pattern."""
 
-    def __init__(self) -> None:
-        """Initialize the EnrollmentService with backend URL configuration."""
-        self.base_url = os.getenv("BACKEND_URL", const.DEFAULT_BACKEND_URL)
-        self.api_url = f"{self.base_url}{const.API_V1_PREFIX}{const.ENROLLMENT_ENDPOINT}"
+    def __init__(self, repository: EnrollmentRepositoryInterface) -> None:
+        """
+        Initialize the EnrollmentService with repository injection.
 
-    def upload_enrollment_csv(self, course_id: str, file) -> dict:
+        Args:
+            repository: The repository implementation for data access
+        """
+        self._repository = repository
+
+    def upload_enrollment_csv(self, course_id: str, file: Any) -> dict:
         """
         Upload a CSV file containing student enrollment data.
 
@@ -35,17 +39,14 @@ class EnrollmentService(EnrollmentServiceInterface):
             EnrollmentServiceError: If the upload fails
         """
         try:
-            files = {"file": (file.name, file, "text/csv")}
+            if not course_id or not course_id.strip():
+                raise ValueError("Course ID cannot be empty")
 
-            response = requests.post(
-                f"{self.api_url}/{course_id}",
-                files=files,
-                timeout=const.REQUEST_TIMEOUT,
-            )
-            response.raise_for_status()
+            if not file:
+                raise ValueError("File is required")
 
-            return response.json()
+            return self._repository.upload_csv(course_id, file)
 
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             msg = f"Failed to upload enrollment CSV: {e!s}"
             raise EnrollmentServiceError(msg) from e
