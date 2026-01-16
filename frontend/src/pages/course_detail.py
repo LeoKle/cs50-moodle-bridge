@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from containers import container
+from dependencies import container
 from services.course_service import CourseServiceError
 from services.enrollment_service import EnrollmentServiceError
 from utils import error_handler

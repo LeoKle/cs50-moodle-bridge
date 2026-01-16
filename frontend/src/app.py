@@ -2,7 +2,7 @@
 
 import streamlit as st
 
-from containers import container
+from dependencies import container
 from services.course_service import CourseServiceError
 from ui.course_ui import render_add_course_dialog, render_course_list
 from utils import error_handler

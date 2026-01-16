@@ -42,3 +42,17 @@ uv run pytest -m unit
 ```bash
 uv run pytest --cov=src --cov-report=html
 ```
+
+## .env Configuration Options
+
+```python
+
+# Enable mock services (set to "true" to use mocks, "false" to use real backend)
+USE_MOCK_SERVICES=true
+
+# API Configuration (not used when USE_MOCK_SERVICES=true, but kept for reference)
+API_BACKEND_URL=http://localhost:8000
+API_TIMEOUT=30
+
+LOG_LEVEL=INFO
+```
