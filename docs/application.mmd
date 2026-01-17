@@ -118,3 +118,9 @@ classDiagram
     %% class IStudentRepository
     %% IStudentService ..> IStudentRepository
     %% StudentController ..> IStudentService
+
+    class CS50SubmissionProblemContoller {
+        POST /cs50/submissions/slug/import (file)
+        GET /cs50/submissions/slug
+    }
+    CS50SubmissionProblemContoller ..> ICS50SubmissionProblemService
