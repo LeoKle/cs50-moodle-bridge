@@ -1,213 +1,214 @@
-from unittest.mock import Mock, patch
+"""Tests for CourseService with repository pattern."""
 
 import pytest
-import requests
 
-from services.course_service import CourseService
+from models.course import CourseCreate, CourseOut
+from services.course_service import CourseService, CourseServiceError
+from tests.mocks.repositories.course_repository_mock import (
+    MockCourseRepository,
+    MockCourseRepositoryError,
+)
 
 pytestmark = pytest.mark.unit
 
 
 @pytest.fixture
-def course_service():
-    """Fixture to provide a CourseService instance."""
-    return CourseService()
+def mock_repository():
+    """Fixture to provide a MockCourseRepository instance."""
+    return MockCourseRepository()
 
 
 @pytest.fixture
-def mock_response():
-    """Fixture to create a mock response object."""
-    mock = Mock()
-    mock.raise_for_status = Mock()
-    return mock
+def course_service(mock_repository):
+    """Fixture to provide a CourseService instance with mock repository."""
+    return CourseService(repository=mock_repository)
 
 
-def test_course_service_initializes_with_default_url():
-    """Test that CourseService initializes with default URL."""
-    service = CourseService()
-    assert service.base_url == "http://localhost:8000"
-    assert service.api_url == "http://localhost:8000/api/v1/courses"
-
-
-def test_course_service_initializes_with_env_url():
-    """Test that CourseService initializes with environment URL."""
-    with patch.dict("os.environ", {"BACKEND_URL": "http://example.com:9000"}):
-        service = CourseService()
-        assert service.base_url == "http://example.com:9000"
-        assert service.api_url == "http://example.com:9000/api/v1/courses"
-
-
-def test_get_courses_returns_list_on_success(course_service, mock_response):
-    """Test get_courses returns a list of courses on successful response."""
-    mock_courses = [
-        {"id": "1", "name": "Course 1", "cs50_id": 50, "exercise_ids": []},
-        {"id": "2", "name": "Course 2", "cs50_id": 51, "exercise_ids": []},
+@pytest.fixture
+def sample_courses():
+    """Fixture to provide sample course data."""
+    return [
+        CourseOut(id="1", name="Python Programming", cs50_id=50, exercise_ids=[]),
+        CourseOut(id="2", name="Advanced Python", cs50_id=51, exercise_ids=["ex1", "ex2"]),
+        CourseOut(id="3", name="Data Structures", cs50_id=52, exercise_ids=[]),
     ]
-    mock_response.json.return_value = mock_courses
-
-    with patch("requests.get", return_value=mock_response) as mock_get:
-        result = course_service.get_courses()
-
-        mock_get.assert_called_once_with(course_service.api_url, timeout=30)
-        assert result == mock_courses
-        assert len(result) == 2
 
 
-def test_get_courses_raises_exception_on_request_failure(course_service):
-    """Test get_courses raises exception when request fails."""
-    with patch(
-        "requests.get",
-        side_effect=requests.exceptions.ConnectionError("Connection error"),
-    ):
-        with pytest.raises(Exception) as exc_info:
-            course_service.get_courses()
-
-        assert "Failed to fetch courses" in str(exc_info.value)
+def test_get_courses_returns_empty_list_when_no_courses(course_service):
+    """Test get_courses returns empty list when repository has no data."""
+    result = course_service.get_courses()
+    assert result == []
+    assert isinstance(result, list)
 
 
-def test_get_courses_raises_exception_on_http_error(course_service, mock_response):
-    """Test get_courses raises exception on HTTP error."""
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Not Found")
+def test_get_courses_returns_sorted_list(course_service, mock_repository, sample_courses):
+    """Test get_courses returns courses sorted by name."""
+    mock_repository.seed_data(sample_courses)
 
-    with patch("requests.get", return_value=mock_response):
-        with pytest.raises(Exception) as exc_info:
-            course_service.get_courses()
+    result = course_service.get_courses()
 
-        assert "Failed to fetch courses" in str(exc_info.value)
-
-
-def test_get_course_returns_course_on_success(course_service, mock_response):
-    """Test get_course returns a single course on successful response."""
-    mock_course = {
-        "id": "123",
-        "name": "Test Course",
-        "cs50_id": 50,
-        "exercise_ids": [],
-    }
-    mock_response.json.return_value = mock_course
-
-    with patch("requests.get", return_value=mock_response) as mock_get:
-        result = course_service.get_course("123")
-
-        mock_get.assert_called_once_with(f"{course_service.api_url}/123", timeout=30)
-        assert result == mock_course
-        assert result["id"] == "123"
+    assert len(result) == 3
+    assert result[0].name == "Advanced Python"
+    assert result[1].name == "Data Structures"
+    assert result[2].name == "Python Programming"
 
 
-def test_get_course_raises_exception_on_request_failure(course_service):
-    """Test get_course raises exception when request fails."""
-    with patch("requests.get", side_effect=requests.exceptions.Timeout("Timeout")):
-        with pytest.raises(Exception) as exc_info:
-            course_service.get_course("123")
+def test_get_courses_raises_service_error_on_repository_failure(course_service, mock_repository):
+    """Test get_courses raises CourseServiceError when repository fails."""
 
-        assert "Failed to fetch course" in str(exc_info.value)
+    def raise_error():
+        msg = "Database error"
+        raise MockCourseRepositoryError(msg)
 
+    mock_repository.get_all = raise_error
 
-def test_get_course_raises_exception_on_http_error(course_service, mock_response):
-    """Test get_course raises exception on HTTP error."""
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Not Found")
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.get_courses()
 
-    with patch("requests.get", return_value=mock_response):
-        with pytest.raises(Exception) as exc_info:
-            course_service.get_course("123")
-
-        assert "Failed to fetch course" in str(exc_info.value)
+    assert "Failed to fetch courses" in str(exc_info.value)
 
 
-def test_create_course_with_name_only(course_service, mock_response):
-    """Test create_course with only name parameter."""
-    mock_course = {"id": "1", "name": "New Course", "cs50_id": None, "exercise_ids": []}
-    mock_response.json.return_value = mock_course
+def test_get_course_returns_course_by_id(course_service, mock_repository, sample_courses):
+    """Test get_course returns a single course by ID."""
+    mock_repository.seed_data(sample_courses)
 
-    with patch("requests.post", return_value=mock_response) as mock_post:
-        result = course_service.create_course("New Course")
+    result = course_service.get_course("2")
 
-        mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course"}, timeout=30
-        )
-        assert result == mock_course
-        assert result["name"] == "New Course"
-        assert result["cs50_id"] is None
+    assert result.id == "2"
+    assert result.name == "Advanced Python"
+    assert result.cs50_id == 51
+    assert result.exercise_ids == ["ex1", "ex2"]
 
 
-def test_create_course_with_name_and_cs50_id(course_service, mock_response):
+def test_get_course_raises_error_when_not_found(course_service):
+    """Test get_course raises CourseServiceError when course doesn't exist."""
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.get_course("nonexistent")
+
+    assert "Failed to fetch course" in str(exc_info.value)
+
+
+def test_get_course_raises_service_error_on_repository_failure(course_service, mock_repository):
+    """Test get_course raises CourseServiceError when repository fails."""
+
+    def raise_error(course_id):
+        msg = "Database connection lost"
+        raise MockCourseRepositoryError(msg)
+
+    mock_repository.get_by_id = raise_error
+
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.get_course("123")
+
+    assert "Failed to fetch course" in str(exc_info.value)
+
+
+def test_create_course_with_name_string(course_service):
+    """Test create_course with only name parameter as string."""
+    result = course_service.create_course("New Course")
+
+    assert result.name == "New Course"
+    assert result.id is not None
+    assert result.cs50_id is None
+    assert result.exercise_ids == []
+
+
+def test_create_course_with_name_and_cs50_id(course_service):
     """Test create_course with both name and cs50_id parameters."""
-    mock_course = {"id": "1", "name": "New Course", "cs50_id": 100, "exercise_ids": []}
-    mock_response.json.return_value = mock_course
+    result = course_service.create_course("Advanced Course", cs50_id=100)
 
-    with patch("requests.post", return_value=mock_response) as mock_post:
-        result = course_service.create_course("New Course", cs50_id=100)
-
-        mock_post.assert_called_once_with(
-            course_service.api_url,
-            json={"name": "New Course", "cs50_id": 100},
-            timeout=30,
-        )
-        assert result == mock_course
-        assert result["cs50_id"] == 100
+    assert result.name == "Advanced Course"
+    assert result.cs50_id == 100
+    assert result.id is not None
 
 
-def test_create_course_with_none_cs50_id(course_service, mock_response):
-    """Test create_course with explicitly None cs50_id."""
-    mock_course = {"id": "1", "name": "New Course", "cs50_id": None, "exercise_ids": []}
-    mock_response.json.return_value = mock_course
+def test_create_course_with_course_create_object(course_service):
+    """Test create_course with CourseCreate object."""
+    course_data = CourseCreate(name="Test Course", cs50_id=50, exercise_ids=["ex1", "ex2", "ex3"])
 
-    with patch("requests.post", return_value=mock_response) as mock_post:
-        result = course_service.create_course("New Course", cs50_id=None)
+    result = course_service.create_course(course_data)
 
-        mock_post.assert_called_once_with(
-            course_service.api_url, json={"name": "New Course"}, timeout=30
-        )
-        assert result == mock_course
+    assert result.name == "Test Course"
+    assert result.cs50_id == 50
+    assert result.exercise_ids == ["ex1", "ex2", "ex3"]
 
 
-def test_create_course_raises_exception_on_request_failure(course_service):
-    """Test create_course raises exception when request fails."""
-    with patch("requests.post", side_effect=requests.exceptions.RequestException("Error")):
-        with pytest.raises(Exception) as exc_info:
-            course_service.create_course("New Course")
+def test_create_course_validates_empty_name(course_service):
+    """Test create_course raises ValueError when name is empty."""
+    with pytest.raises(ValueError) as exc_info:
+        course_service.create_course("")
 
-        assert "Failed to create course" in str(exc_info.value)
-
-
-def test_create_course_raises_exception_on_http_error(course_service, mock_response):
-    """Test create_course raises exception on HTTP error."""
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("400 Bad Request")
-
-    with patch("requests.post", return_value=mock_response):
-        with pytest.raises(Exception) as exc_info:
-            course_service.create_course("New Course")
-
-        assert "Failed to create course" in str(exc_info.value)
+    # Pydantic validation error for empty string
+    assert "String should have at least 1 character" in str(exc_info.value)
 
 
-def test_delete_course_success(course_service, mock_response):
+def test_create_course_validates_whitespace_name(course_service):
+    """Test create_course raises ValueError when name is only whitespace."""
+    with pytest.raises(ValueError) as exc_info:
+        course_service.create_course("   ")
+
+    assert "Course name cannot be empty" in str(exc_info.value)
+
+
+def test_create_course_raises_service_error_on_repository_failure(course_service, mock_repository):
+    """Test create_course raises CourseServiceError when repository fails."""
+
+    def raise_error(course):
+        msg = "Database write error"
+        raise MockCourseRepositoryError(msg)
+
+    mock_repository.create = raise_error
+
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.create_course("New Course")
+
+    assert "Failed to create course" in str(exc_info.value)
+
+
+def test_delete_course_removes_course(course_service, mock_repository, sample_courses):
     """Test delete_course successfully deletes a course."""
-    with patch("requests.delete", return_value=mock_response) as mock_delete:
+    mock_repository.seed_data(sample_courses)
+
+    assert len(mock_repository.get_all()) == 3
+
+    course_service.delete_course("2")
+
+    courses = mock_repository.get_all()
+    assert len(courses) == 2
+    assert all(c.id != "2" for c in courses)
+
+
+def test_delete_course_raises_error_when_not_found(course_service):
+    """Test delete_course raises CourseServiceError when course doesn't exist."""
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.delete_course("nonexistent")
+
+    assert "Failed to delete course" in str(exc_info.value)
+
+
+def test_delete_course_raises_service_error_on_repository_failure(course_service, mock_repository):
+    """Test delete_course raises CourseServiceError when repository fails."""
+
+    def raise_error(course_id):
+        msg = "Database delete error"
+        raise MockCourseRepositoryError(msg)
+
+    mock_repository.delete = raise_error
+
+    with pytest.raises(CourseServiceError) as exc_info:
         course_service.delete_course("123")
 
-        mock_delete.assert_called_once_with(f"{course_service.api_url}/123", timeout=30)
-        mock_response.raise_for_status.assert_called_once()
+    assert "Failed to delete course" in str(exc_info.value)
 
 
-def test_delete_course_raises_exception_on_request_failure(course_service):
-    """Test delete_course raises exception when request fails."""
-    with patch(
-        "requests.delete",
-        side_effect=requests.exceptions.ConnectionError("Connection error"),
-    ):
-        with pytest.raises(Exception) as exc_info:
-            course_service.delete_course("123")
+def test_service_uses_repository_methods(course_service, mock_repository):
+    """Test that service properly delegates to repository methods."""
+    course = course_service.create_course("Test Course", cs50_id=42)
 
-        assert "Failed to delete course" in str(exc_info.value)
+    all_courses = mock_repository.get_all()
+    assert len(all_courses) == 1
+    assert all_courses[0].name == "Test Course"
 
-
-def test_delete_course_raises_exception_on_http_error(course_service, mock_response):
-    """Test delete_course raises exception on HTTP error."""
-    mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError("404 Not Found")
-
-    with patch("requests.delete", return_value=mock_response):
-        with pytest.raises(Exception) as exc_info:
-            course_service.delete_course("123")
-
-        assert "Failed to delete course" in str(exc_info.value)
+    retrieved = course_service.get_course(course.id)
+    assert retrieved.name == "Test Course"
+    assert retrieved.cs50_id == 42
