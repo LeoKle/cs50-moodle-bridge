@@ -95,7 +95,7 @@ classDiagram
     class AnonymousGitHubAuth {
         get_headers()
     }
-    AnonymousGitHubAuth ..|> GitHubAuthProvider
+    AnonymousGitHubAuth --|> GitHubAuthProvider
     class GitHubAppAuth {
         now()
         parse_github_time()
@@ -103,7 +103,7 @@ classDiagram
         ensure_token()
         %% get_headers()
     }
-    GitHubAppAuth ..|> GitHubAuthProvider
+    GitHubAppAuth --|> GitHubAuthProvider
 
     %% class IRepository {
     %%     create()
