@@ -1,0 +1,24 @@
+"""Interface definition for course service implementations."""
+
+from abc import ABC, abstractmethod
+
+from models.course import CourseCreate, CourseOut, CourseUpdate
+
+
+class CourseServiceInterface(ABC):
+    @abstractmethod
+    def get_courses(self) -> list[CourseOut]: ...
+
+    @abstractmethod
+    def get_course(self, course_id: str) -> CourseOut: ...
+
+    @abstractmethod
+    def create_course(
+        self, course: CourseCreate | str, cs50_id: int | None = None
+    ) -> CourseOut: ...
+
+    @abstractmethod
+    def update_course(self, course_id: str, course: CourseUpdate) -> CourseOut: ...
+
+    @abstractmethod
+    def delete_course(self, course_id: str) -> None: ...

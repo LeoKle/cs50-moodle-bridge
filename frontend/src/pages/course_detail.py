@@ -1,0 +1,249 @@
+"""Course detail page for viewing and managing individual courses."""
+
+import streamlit as st
+
+from dependencies import container
+from models.course import CourseUpdate
+from services.course_service import CourseServiceError
+from services.enrollment_service import EnrollmentServiceError
+from utils import error_handler
+
+st.set_page_config(
+    page_title="Course Details - CS50 Moodle Bridge",
+    page_icon="📖",
+    layout="wide",
+)
+
+course_service = container.course_service()
+enrollment_service = container.enrollment_service()
+
+st.title("📖 Course Details")
+
+try:
+    all_courses = course_service.get_courses()
+except CourseServiceError as e:
+    error_handler.handle_error_service(e, "load courses")
+    st.stop()
+
+if not all_courses:
+    error_handler.handle_error_no_courses()
+
+course_options = {f"{course.name} (...{course.id[-4:]})": course.id for course in all_courses}
+course_display_names = list(course_options.keys())
+
+selected_course_display = st.selectbox(
+    "Select a course to view details:",
+    options=course_display_names,
+    index=0 if course_display_names else None,
+    help="Choose a course from the dropdown to view its details",
+)
+
+course_id = course_options[selected_course_display] if selected_course_display else None
+
+if not course_id:
+    st.info("Please select a course from the dropdown above.")
+    st.stop()
+
+try:
+    course = course_service.get_course(course_id)
+    st.header(f"Course: {course.name}")
+
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📋 Overview",
+        "🎯 Exercises",
+        "👥 Students",
+        "⚙️ Settings",
+    ])
+
+    with tab1:
+        st.subheader("Course Overview")
+
+        info_col1, info_col2, info_col3 = st.columns(3)
+
+        with info_col1:
+            st.metric(label="Course ID", value=course.id, help="MongoDB Object ID")
+
+        with info_col2:
+            st.metric(
+                label="CS50 ID",
+                value=course.cs50_id or "Not linked",
+                help="CS50 course identifier",
+            )
+
+        with info_col3:
+            st.metric(
+                label="Total Exercises",
+                value=len(course.exercise_ids),
+                help="Number of exercises in this course",
+            )
+
+        st.divider()
+
+        st.subheader("Course Details")
+
+        details_col1, details_col2 = st.columns(2)
+
+        with details_col1:
+            st.markdown("**Course Name:**")
+            st.info(course.name)
+
+            st.markdown("**Course ID:**")
+            st.code(course.id, language=None)
+
+        with details_col2:
+            st.markdown("**CS50 Integration:**")
+            if course.cs50_id:
+                st.success(f"Linked to CS50 Course ID: {course.cs50_id}")
+            else:
+                st.warning("Not linked to CS50")
+
+            st.markdown("**Exercise Count:**")
+            st.info(f"{len(course.exercise_ids)} exercise(s) configured")
+
+    with tab2:
+        st.subheader("Exercises")
+
+        if course.exercise_ids:
+            st.write(f"This course has **{len(course.exercise_ids)}** exercise(s):")
+
+            for idx, exercise_id in enumerate(course.exercise_ids, 1):
+                with st.container():
+                    ex_col1, ex_col2 = st.columns([0.1, 0.9])
+                    with ex_col1:
+                        st.markdown(f"**{idx}.**")
+                    with ex_col2:
+                        st.code(exercise_id, language=None)
+
+            st.divider()
+
+            if st.button("📋 Copy All Exercise IDs", use_container_width=True):
+                exercise_list = "\n".join(course.exercise_ids)
+                st.code(exercise_list, language=None)
+                st.success("Exercise IDs displayed above - copy them from the code block")
+        else:
+            st.info("No exercises have been added to this course yet.")
+            st.markdown("""
+            **To add exercises:**
+            - Use the API to add exercise IDs to this course
+            - Or update the course configuration through the backend
+            """)
+
+    with tab3:
+        st.subheader("Student Enrollment")
+
+        uploaded_file = st.file_uploader(
+            "Choose a CSV file",
+            type=["csv"],
+            help="Upload a CSV file with student enrollment data",
+            accept_multiple_files=False,
+        )
+
+        if uploaded_file is not None:
+            # Display file information
+            st.info(f"📄 File selected: **{uploaded_file.name}** ({uploaded_file.size} bytes)")
+
+            # Validate file type
+            if not uploaded_file.name.endswith(".csv"):
+                st.error("⚠️ Invalid file type. Please upload a CSV file.")
+            else:
+                col1, col2 = st.columns([0.3, 0.7])
+
+                with col1:
+                    if st.button(
+                        "📤 Upload CSV",
+                        type="primary",
+                        use_container_width=True,
+                    ):
+                        try:
+                            with st.spinner("Uploading and processing CSV..."):
+                                # Upload the file using the enrollment service
+                                result = enrollment_service.upload_enrollment_csv(
+                                    course_id=course_id,
+                                    file=uploaded_file,
+                                )
+
+                            # Display success message with details
+                            st.success("✅ Students enrolled successfully!")
+
+                            # Show enrollment results if available
+                            if result:
+                                st.json(result)
+
+                        except EnrollmentServiceError as e:
+                            st.error(f"❌ Failed to upload CSV file: {e!s}")
+        else:
+            st.info("⚠️ Please select a CSV file to upload.")
+
+        st.divider()
+
+        with st.expander("View Sample CSV Format"):
+            sample_csv = """Vorname,Nachname,E-Mail-Adresse
+Max,Mustermann,max.mustermann@example.com
+Erika,Musterfrau,erika.musterfrau@example.com"""
+            st.code(sample_csv, language="csv")
+
+    with tab4:
+        st.subheader("Course Settings")
+
+        st.markdown("### Course Information")
+
+        with st.form("course_settings_form"):
+            course_name_input = st.text_input(
+                "Course Name",
+                value=course.name,
+                help="The display name for this course",
+            )
+
+            cs50_id_input = st.number_input(
+                "CS50 Course ID",
+                value=course.cs50_id or 0,
+                min_value=0,
+                step=1,
+                help="Link this course to a CS50 course ID (0 = not linked)",
+            )
+
+            st.divider()
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                update_button = st.form_submit_button(
+                    "💾 Update Course", type="primary", use_container_width=True
+                )
+
+            with col2:
+                delete_button = st.form_submit_button("🗑️ Delete Course", use_container_width=True)
+
+            if update_button:
+                try:
+                    # Prepare update data - only include fields that changed
+                    update_data = CourseUpdate()
+
+                    if course_name_input != course.name:
+                        update_data.name = course_name_input
+
+                    cs50_id_value = cs50_id_input if cs50_id_input != 0 else None
+                    if cs50_id_value != course.cs50_id:
+                        update_data.cs50_id = cs50_id_value
+
+                    # Check if anything actually changed
+                    if update_data.name is None and update_data.cs50_id is None:
+                        st.info("No changes detected")
+                    else:
+                        with st.spinner("Updating course..."):
+                            updated_course = course_service.update_course(course_id, update_data)
+
+                        st.success(f"✅ Course '{updated_course.name}' updated successfully!")
+                        st.rerun()
+
+                except ValueError as e:
+                    st.error(f"❌ Validation error: {e!s}")
+                except CourseServiceError as e:
+                    st.error(f"❌ Failed to update course: {e!s}")
+
+            if delete_button:
+                error_handler.handle_action_delete_course(course_service, course_id, course.name)
+
+except CourseServiceError as e:
+    error_handler.handle_error_service(e, "load course")
+    error_handler.handle_error_backend_unavailable(redirect_page="app.py")
