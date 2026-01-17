@@ -6,6 +6,8 @@ from config.settings import get_app_settings
 from dependencies import DependencyContainer
 from models.course import CourseCreate
 
+pytestmark = pytest.mark.integration
+
 
 @pytest.fixture
 def mock_container():

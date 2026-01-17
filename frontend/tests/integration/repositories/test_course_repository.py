@@ -8,7 +8,7 @@ import pytest
 from models.course import CourseCreate, CourseOut, CourseUpdate
 from repositories.course_repository import CourseRepository, CourseRepositoryError
 
-pytestmark = pytest.mark.unit
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture

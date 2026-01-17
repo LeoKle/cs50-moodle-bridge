@@ -11,7 +11,7 @@ from repositories.enrollment_repository import (
     EnrollmentRepositoryError,
 )
 
-pytestmark = pytest.mark.unit
+pytestmark = pytest.mark.integration
 
 
 @pytest.fixture
