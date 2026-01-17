@@ -2,7 +2,7 @@
 
 import pytest
 
-from models.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut, CourseUpdate
 from services.course_service import CourseService, CourseServiceError
 from tests.mocks.repositories.course_repository_mock import (
     MockCourseRepository,
@@ -199,6 +199,115 @@ def test_delete_course_raises_service_error_on_repository_failure(course_service
         course_service.delete_course("123")
 
     assert "Failed to delete course" in str(exc_info.value)
+
+
+def test_update_course_updates_name(course_service, mock_repository, sample_courses):
+    """Test update_course successfully updates course name."""
+    mock_repository.seed_data(sample_courses)
+
+    update_data = CourseUpdate(name="Updated Python Programming")
+    result = course_service.update_course("1", update_data)
+
+    assert result.id == "1"
+    assert result.name == "Updated Python Programming"
+    assert result.cs50_id == 50  # Unchanged
+    assert result.exercise_ids == []  # Unchanged
+
+
+def test_update_course_updates_cs50_id(course_service, mock_repository, sample_courses):
+    """Test update_course successfully updates CS50 ID."""
+    mock_repository.seed_data(sample_courses)
+
+    update_data = CourseUpdate(cs50_id=999)
+    result = course_service.update_course("2", update_data)
+
+    assert result.id == "2"
+    assert result.name == "Advanced Python"  # Unchanged
+    assert result.cs50_id == 999
+    assert result.exercise_ids == ["ex1", "ex2"]  # Unchanged
+
+
+def test_update_course_updates_exercise_ids(course_service, mock_repository, sample_courses):
+    """Test update_course successfully updates exercise IDs."""
+    mock_repository.seed_data(sample_courses)
+
+    update_data = CourseUpdate(exercise_ids=["new1", "new2", "new3"])
+    result = course_service.update_course("3", update_data)
+
+    assert result.id == "3"
+    assert result.name == "Data Structures"  # Unchanged
+    assert result.cs50_id == 52  # Unchanged
+    assert result.exercise_ids == ["new1", "new2", "new3"]
+
+
+def test_update_course_updates_multiple_fields(course_service, mock_repository, sample_courses):
+    """Test update_course successfully updates multiple fields at once."""
+    mock_repository.seed_data(sample_courses)
+
+    update_data = CourseUpdate(
+        name="Completely New Name",
+        cs50_id=777,
+        exercise_ids=["a", "b", "c"],
+    )
+    result = course_service.update_course("1", update_data)
+
+    assert result.id == "1"
+    assert result.name == "Completely New Name"
+    assert result.cs50_id == 777
+    assert result.exercise_ids == ["a", "b", "c"]
+
+
+def test_update_course_validates_empty_name(course_service, mock_repository, sample_courses):
+    """Test update_course raises ValueError when name is empty."""
+    mock_repository.seed_data(sample_courses)
+
+    # Pydantic will catch this during model validation
+    with pytest.raises(ValueError) as exc_info:
+        CourseUpdate(name="")
+
+    assert "String should have at least 1 character" in str(exc_info.value)
+
+
+def test_update_course_validates_whitespace_name(course_service, mock_repository, sample_courses):
+    """Test update_course raises ValueError when name is only whitespace."""
+    mock_repository.seed_data(sample_courses)
+
+    update_data = CourseUpdate(name="   ")
+
+    with pytest.raises(ValueError) as exc_info:
+        course_service.update_course("1", update_data)
+
+    assert "Course name cannot be empty" in str(exc_info.value)
+
+
+def test_update_course_raises_error_when_not_found(course_service):
+    """Test update_course raises CourseServiceError when course doesn't exist."""
+    update_data = CourseUpdate(name="New Name")
+
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.update_course("nonexistent", update_data)
+
+    assert "Failed to update course" in str(exc_info.value)
+
+
+def test_update_course_raises_service_error_on_repository_failure(
+    course_service, mock_repository, sample_courses
+):
+    """Test update_course raises CourseServiceError when repository fails."""
+    mock_repository.seed_data(sample_courses)
+
+    def raise_error(course_id, course):
+        msg = "Database update error"
+        raise MockCourseRepositoryError(msg)
+
+    mock_repository.update = raise_error
+
+    update_data = CourseUpdate(name="New Name")
+
+    with pytest.raises(CourseServiceError) as exc_info:
+        course_service.update_course("1", update_data)
+
+    assert "Failed to update course" in str(exc_info.value)
 
 
 def test_service_uses_repository_methods(course_service, mock_repository):

@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 
-from models.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut, CourseUpdate
 
 
 class CourseServiceInterface(ABC):
@@ -16,6 +16,9 @@ class CourseServiceInterface(ABC):
     def create_course(
         self, course: CourseCreate | str, cs50_id: int | None = None
     ) -> CourseOut: ...
+
+    @abstractmethod
+    def update_course(self, course_id: str, course: CourseUpdate) -> CourseOut: ...
 
     @abstractmethod
     def delete_course(self, course_id: str) -> None: ...

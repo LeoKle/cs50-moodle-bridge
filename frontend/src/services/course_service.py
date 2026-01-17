@@ -4,7 +4,7 @@ from interfaces.repositories.course_repository_interface import (
     CourseRepositoryInterface,
 )
 from interfaces.services import CourseServiceInterface
-from models.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut, CourseUpdate
 
 
 class CourseServiceError(Exception):
@@ -81,6 +81,28 @@ class CourseService(CourseServiceInterface):
             return self._repository.create(payload)
         except Exception as e:
             msg = f"Failed to create course: {e!s}"
+            raise CourseServiceError(msg) from e
+
+    def update_course(self, course_id: str, course: CourseUpdate) -> CourseOut:
+        """
+        Update an existing course with validation.
+
+        Args:
+            course_id: The ID of the course to update
+            course: CourseUpdate object with fields to update
+
+        Returns:
+            CourseOut: The updated course
+        """
+        # Validate course name if provided
+        if course.name is not None and (not course.name or not course.name.strip()):
+            msg = "Course name cannot be empty"
+            raise ValueError(msg)
+
+        try:
+            return self._repository.update(course_id, course)
+        except Exception as e:
+            msg = f"Failed to update course: {e!s}"
             raise CourseServiceError(msg) from e
 
     def delete_course(self, course_id: str) -> None:

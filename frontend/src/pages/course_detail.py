@@ -3,6 +3,7 @@
 import streamlit as st
 
 from dependencies import container
+from models.course import CourseUpdate
 from services.course_service import CourseServiceError
 from services.enrollment_service import EnrollmentServiceError
 from utils import error_handler
@@ -214,8 +215,31 @@ Erika,Musterfrau,erika.musterfrau@example.com"""
                 delete_button = st.form_submit_button("🗑️ Delete Course", use_container_width=True)
 
             if update_button:
-                st.info("Update functionality coming soon!")
-                st.caption("This feature will allow you to modify course details.")
+                try:
+                    # Prepare update data - only include fields that changed
+                    update_data = CourseUpdate()
+
+                    if course_name_input != course.name:
+                        update_data.name = course_name_input
+
+                    cs50_id_value = cs50_id_input if cs50_id_input != 0 else None
+                    if cs50_id_value != course.cs50_id:
+                        update_data.cs50_id = cs50_id_value
+
+                    # Check if anything actually changed
+                    if update_data.name is None and update_data.cs50_id is None:
+                        st.info("No changes detected")
+                    else:
+                        with st.spinner("Updating course..."):
+                            updated_course = course_service.update_course(course_id, update_data)
+
+                        st.success(f"✅ Course '{updated_course.name}' updated successfully!")
+                        st.rerun()
+
+                except ValueError as e:
+                    st.error(f"❌ Validation error: {e!s}")
+                except CourseServiceError as e:
+                    st.error(f"❌ Failed to update course: {e!s}")
 
             if delete_button:
                 error_handler.handle_action_delete_course(course_service, course_id, course.name)

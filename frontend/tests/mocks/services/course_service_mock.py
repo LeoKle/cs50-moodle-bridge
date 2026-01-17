@@ -1,5 +1,5 @@
 from interfaces.services import CourseServiceInterface
-from models.course import CourseCreate, CourseOut
+from models.course import CourseCreate, CourseOut, CourseUpdate
 
 
 class CourseServiceMockError(Exception):
@@ -43,6 +43,27 @@ class MockCourseService(CourseServiceInterface):
         })
         self._data[course_id] = course_out
         return course_out
+
+    def update_course(self, course_id: str, course: CourseUpdate) -> CourseOut:
+        """Update an existing course."""
+        if course_id not in self._data:
+            msg = f"Course with id {course_id} not found"
+            raise CourseServiceMockError(msg)
+
+        existing = self._data[course_id]
+        updated_data = existing.model_dump()
+
+        # Update only provided fields
+        if course.name is not None:
+            updated_data["name"] = course.name
+        if course.cs50_id is not None:
+            updated_data["cs50_id"] = course.cs50_id
+        if course.exercise_ids is not None:
+            updated_data["exercise_ids"] = course.exercise_ids
+
+        updated_course = CourseOut(**updated_data)
+        self._data[course_id] = updated_course
+        return updated_course
 
     def delete_course(self, course_id: str) -> None:
         """Delete a course by ID."""
