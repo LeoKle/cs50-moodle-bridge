@@ -3,9 +3,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-context-and-scope]]
 == Context and Scope
 
-* The system acts as an intermediary between CS50 and Moodle.
-* It fetches submission data from CS50 and updates grades in Moodle.
-* Direct communication between CS50 and Moodle does not exist.
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -63,7 +60,9 @@ endif::arc42help[]
 [mermaid]
 ....
 flowchart LR
-    Tutor([Tutor])
+    TutorA([Tutor])
+    TutorB([Tutor])
+    TutorC([Tutor])
 
     subgraph External Systems
         Moodle[(Moodle)]
@@ -72,10 +71,19 @@ flowchart LR
 
     BridgeApp[CS50–Moodle Bridge Application]
 
-    Tutor -->|"uses web UI"| BridgeApp
-    Moodle -->|"exports worksheet"| BridgeApp
-    CS50 -->|"exports evaluation data"| BridgeApp
-    BridgeApp -->|"produces updated grades file"| Moodle
+    %% Moodle
+    Moodle -->|"exports worksheet"| TutorA
+    TutorA -->|"uploads worksheet"| BridgeApp
+
+    BridgeApp -->|"exports grades"| TutorC
+    TutorC -->|"uploads worksheet"| Moodle
+
+    %% CS50
+    CS50 -->|"exports submissions"| TutorA
+    TutorA -->|"uploads submissions"| BridgeApp
+
+    %% User
+    BridgeApp -->|"displays overview over courses, students, submissions"| TutorC
 ....
 
 === Technical Context
@@ -128,3 +136,4 @@ flowchart LR
     BE -->|"generate updated<br/>Moodle worksheet"| FE
     FE -->|"download file"| Tutor
 ....
+

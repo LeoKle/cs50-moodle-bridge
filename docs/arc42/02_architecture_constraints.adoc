@@ -31,7 +31,7 @@ The system must operate within several technical, organizational, and environmen
 
 *Technical Constraints*
 
-* The application must support the import and export formats (csv) defined by Moodle and CS50
+* The application must support the import and export formats defined by Moodle (different csv-formats) and CS50 (csv or json)
 * A web-based architecture is required with a separate frontend and backend
 * Student and course data must be stored in a persistent database
 //* The system must run inside the university infrastructure (no external cloud services).
@@ -45,4 +45,4 @@ The system must operate within several technical, organizational, and environmen
 *Environmental Constraints*
 
 //* Network access may be limited, so the system primarily works with local file uploads instead of external APIs.
-* The architecture must remain flexible in case Moodle or CS50 modify their export formats
+* The architecture must remain flexible in case Moodle or CS50 modify their export formats or additional data sources / systems are being used in the future

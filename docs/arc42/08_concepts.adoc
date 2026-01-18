@@ -52,11 +52,11 @@ endif::arc42help[]
 
 The system is based on a small set of core domain concepts:
 
-* Course – represents a teaching unit managed by a tutor
-* Student – represents a participant enrolled in a course
-* Enrollment – represents the association between students and courses
-* Submission – represents a CS50 assignment submission
-* Grade – represents the evaluation result of a submission
+* Course - represents a teaching unit managed by a tutor
+* Student - represents a participant enrolled in a course
+* Enrollment - represents the association between students and courses
+* Submission - represents a CS50 assignment submission
+* Grade - represents the evaluation result of a submission
 
 === Validation Concept
 

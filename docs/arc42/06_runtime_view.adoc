@@ -43,7 +43,7 @@ endif::arc42help[]
 
 1. A tutor sends a request to the Course Controller to create a new course.
 2. The Course Controller validates the request data.
-3. The request is forwarded to the Course Management Service.
+3. The request is forwarded to the Course Service.
 4. The service creates the course and stores it via the course repository.
 5. The API returns a success response to the tutor.
 
@@ -58,9 +58,9 @@ endif::arc42help[]
 
 === Scenario 3: Enrollment Management
 
-1. A tutor assigns students to a course.
+1. A tutor uploads an export from Moodle which states the students that are enrolled in the respective course.
 2. The Enrollment Controller validates the request.
-3. The Enrollment Management Service creates enrollment records.
+3. The Enrollment Service creates enrollment records.
 4. Enrollment data is stored via the enrollment repository.
 5. The API confirms the successful enrollment.
 
