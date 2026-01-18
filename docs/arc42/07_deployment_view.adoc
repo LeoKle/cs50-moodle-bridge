@@ -44,8 +44,6 @@ See https://docs.arc42.org/section-7/[Deployment View] in the arc42 documentatio
 ****
 endif::arc42help[]
 
-=== Infrastructure Level 1
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -60,22 +58,6 @@ For multiple environments or alternative deployments please copy and adapt this 
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
-
-Motivation::
-
-_<explanation in text form>_
-
-Quality and/or Performance Features::
-
-_<explanation in text form>_
-
-Mapping of Building Blocks to Infrastructure::
-_<description of the mapping>_
-
-
-=== Infrastructure Level 2
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -85,16 +67,94 @@ Please copy the structure from level 1 for each selected element.
 ****
 endif::arc42help[]
 
-==== _<Infrastructure Element 1>_
+=== Deployment Diagram
 
-_<diagram + explanation>_
+.Deployment Diagram
+[mermaid]
+....
+flowchart LR
+    Tutor([Tutor / Admin User])
 
-==== _<Infrastructure Element 2>_
+    subgraph Client
+        Browser[Web Browser / UI]
+    end
 
-_<diagram + explanation>_
+    subgraph Backend Server
+        API[CS50–Moodle Bridge Backend]
+    end
 
-...
+    subgraph Persistence
+        DB[(Database)]
+    end
 
-==== _<Infrastructure Element n>_
+    subgraph External Systems
+        CS50[(CS50 System)]
+        Moodle[(Moodle Platform)]
+        GitHub[(GitHub API)]
+    end
 
-_<diagram + explanation>_
+    Tutor -->|"uses"| Browser
+    Browser -->|"HTTPS REST API"| API
+
+    API -->|"stores / reads data"| DB
+    API -->|"imports submissions"| CS50
+    API -->|"exports grades"| Moodle
+    API -->|"resolves identities (optional)"| GitHub
+....
+
+=== Runtime Environment
+
+The backend application runs in the following environment:
+
+* Application runtime: Python-based web service
+* Web framework: FastAPI
+* Execution environment: Local server or containerized deployment
+* Network communication: HTTPS
+
+The application exposes REST-based API endpoint for all core functionalities.
+
+=== Deployment Nodes
+
+The system is deployed across the following nodes:
+
+* Client Node  
+  Used by tutors to manage courses, students, and grading.
+
+* Backend Server  
+  Hosts the CS50–Moodle Bridge Application and its API.
+
+* Database Server  
+  Stores courses, students, submissions, and grading results.
+
+* External Systems  
+  CS50 system, Moodle platform, and GitHub API.
+
+  === Communication Paths
+
+The following communication paths exist:
+
+* Client → Backend Server  
+  HTTP requests for course management, student import,
+  enrollment, submission upload, and grading.
+
+* Backend Server → Database Server  
+  Persistent storage and retrieval of application data.
+
+* Backend Server → CS50 System  
+  Import of submission and evaluation data.
+
+* Backend Server → Moodle  
+  Export of grading results.
+
+* Backend Server → GitHub  
+  Optional resolution of student identities.
+
+All external communication is performed over HTTPS.
+
+=== Deployment Constraints
+
+The deployment is subject to the following constraints:
+
+* External system availability cannot be guaranteed
+* Network latency may affect import and export operations
+* Authentication credentials must be securely managed

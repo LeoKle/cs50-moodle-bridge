@@ -32,13 +32,37 @@ See https://docs.arc42.org/section-12/[Glossary] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-[cols="e,2e" options="header"]
+[options="header"]
 |===
-|Term |Definition
+| Term | Description
 
-|<Term-1>
-|<definition-1>
+| CS50
+| Computer Science course platform used to evaluate programming assignments.
 
-|<Term-2>
-|<definition-2>
+| Moodle
+| Learning management system used to manage courses and grades.
+
+| Course
+| A teaching unit in which students are enrolled and graded.
+
+| Student
+| A participant enrolled in a course and evaluated based on submissions.
+
+| Enrollment
+| The association between a student and a course.
+
+| Submission
+| An assignment submission evaluated by the CS50 system.
+
+| Grade
+| The result of evaluating a submission, used for Moodle grading.
+
+| Integration Adapter
+| A component that encapsulates communication with an external system.
+
+| Repository
+| An abstraction used to store and retrieve domain data.
+
+| API
+| Application Programming Interface used for communication between systems.
 |===

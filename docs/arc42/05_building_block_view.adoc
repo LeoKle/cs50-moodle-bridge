@@ -67,18 +67,67 @@ In the best case you will get away with examples or simple signatures.
 ****
 endif::arc42help[]
 
-_**<Overview Diagram>**_
+=== API Layer
 
-Motivation::
+The API layer exposes HTTP endpoints to the web UI and external clients.
 
-_<text explanation>_
+Responsibilities:
 
+* Accept HTTP requests
+* Validate input data
+* Return HTTP responses and status codes
+* Delegate processing to application services
 
-Contained Building Blocks::
-_<Description of contained building block (black boxes)>_
+Main components:
 
-Important Interfaces::
-_<Description of important interfaces>_
+* Course Controller
+* Enrollment Controller
+* Student Import Controller
+* Submission Controller
+* Grading and Export Controller
+
+=== Application Services
+
+Responsibilities:
+
+* Manage courses
+* Import and manage students
+* Manage enrollments
+* Process CS50 submission data
+* Apply grading rules
+* Coordinate grading export to Moodle
+
+Main components:
+
+* Course Management Service
+* Student Import Service
+* Enrollment Management Service
+* Submission Processing Service
+* Grading Service
+
+=== Integration Components
+
+Responsibilities:
+
+* Import student and submission data from CS50
+* Export grading results to Moodle
+* Resolve student identities via GitHub if required
+
+=== Persistence Components
+
+Responsibilities:
+
+* Store courses
+* Store students and enrollments
+* Store submissions and grading results
+* Retrieve data for grading and export
+
+The dependencies between building blocks follow a strict direction:
+
+* API Layer → Application Services
+* Application Services → Integration Components
+* Application Services → Persistence Components
+
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -102,8 +151,6 @@ Its headline is the name of the black box.
 ****
 endif::arc42help[]
 
-==== <Name black box 1>
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -120,40 +167,6 @@ according the the following black box template:
 ****
 endif::arc42help[]
 
-_<Purpose/Responsibility>_
-
-_<Interface(s)>_
-
-_<(Optional) Quality/Performance Characteristics>_
-
-_<(Optional) Directory/File Location>_
-
-_<(Optional) Fulfilled Requirements>_
-
-_<(optional) Open Issues/Problems/Risks>_
-
-
-
-
-==== <Name black box 2>
-
-_<black box template>_
-
-==== <Name black box n>
-
-_<black box template>_
-
-
-==== <Name interface 1>
-
-...
-
-==== <Name interface m>
-
-
-
-=== Level 2
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -165,32 +178,12 @@ Leave out normal, simple, boring or standardized parts of your system
 ****
 endif::arc42help[]
 
-==== White Box _<building block 1>_
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
 ...describes the internal structure of _building block 1_.
 ****
 endif::arc42help[]
-
-_<white box template>_
-
-==== White Box _<building block 2>_
-
-
-_<white box template>_
-
-...
-
-==== White Box _<building block m>_
-
-
-_<white box template>_
-
-
-
-=== Level 3
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -202,24 +195,9 @@ part of arc42 for additional levels.
 ****
 endif::arc42help[]
 
-==== White Box <_building block x.1_>
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
 Specifies the internal structure of _building block x.1_.
 ****
 endif::arc42help[]
-
-_<white box template>_
-
-
-==== White Box <_building block x.2_>
-
-_<white box template>_
-
-
-
-==== White Box <_building block y.1_>
-
-_<white box template>_

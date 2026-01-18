@@ -39,15 +39,57 @@ See https://docs.arc42.org/section-6/[Runtime View] in the arc42 documentation.
 ****
 endif::arc42help[]
 
-=== <Runtime Scenario 1>
+=== Scenario 1: Course Creation
 
+1. A tutor sends a request to the Course Controller to create a new course.
+2. The Course Controller validates the request data.
+3. The request is forwarded to the Course Service.
+4. The service creates the course and stores it via the course repository.
+5. The API returns a success response to the tutor.
 
-* _<insert runtime diagram or textual description of the scenario>_
-* _<insert description of the notable aspects of the interactions between the
-building block instances depicted in this diagram.>_
+=== Scenario 2: Student Import
 
-=== <Runtime Scenario 2>
+1. A tutor uploads a student list or triggers a student import.
+2. The Student Import Controller validates the input data.
+3. The request is forwarded to the Student Import Service.
+4. The service processes and normalizes student data.
+5. Student data is stored via the student repository.
+6. The API returns an import summary to the tutor.
 
-=== ...
+=== Scenario 3: Enrollment Management
 
-=== <Runtime Scenario n>
+1. A tutor uploads an export from Moodle which states the students that are enrolled in the respective course.
+2. The Enrollment Controller validates the request.
+3. The Enrollment Service creates enrollment records.
+4. Enrollment data is stored via the enrollment repository.
+5. The API confirms the successful enrollment.
+
+=== Scenario 4: CS50 Submission Import
+
+1. A tutor uploads CS50 submission data.
+2. The Submission Controller validates the uploaded data.
+3. The Submission Processing Service parses and normalizes submissions.
+4. Submission data is stored via the submission repository.
+5. The API confirms successful submission import.
+
+=== Scenario 5: Grading
+
+1. The Grading Service retrieves submissions for a course.
+2. Grading rules are applied to determine pass or fail results.
+3. Grading results are stored via the grading repository.
+4. A grading summary is prepared for export.
+
+=== Scenario 6: Grade Export to Moodle
+
+1. A tutor triggers grade export.
+2. The Grading and Export Controller initiates the export process.
+3. The Moodle integration component formats grading data.
+4. Grades are transmitted to Moodle.
+5. The system reports the export status to the tutor.
+
+=== Error Handling Scenario
+
+1. An invalid or incomplete request is received.
+2. The controller detects the error during validation.
+3. The request is rejected with an appropriate HTTP status code.
+4. No data is persisted in case of errors.

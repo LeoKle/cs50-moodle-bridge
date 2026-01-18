@@ -3,7 +3,6 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-quality-scenarios]]
 == Quality Requirements
 
-
 ifdef::arc42help[]
 [role="arc42help"]
 ****
@@ -28,6 +27,38 @@ endif::arc42help[]
 
 
 === Quality Requirements Overview
+
+[options="header"]
+|===
+| Quality Goal | Scenario
+
+| Reliability
+| The bridge consistently synchronizes data between CS50 and Moodle without data loss.
+
+| Performance
+| Synchronization operations complete within acceptable timeframes.
+
+| Maintainability
+| The system can be easily extended to support new CS50 courses without major architectural changes.
+
+| Security
+| User credentials and course data are encrypted and securely transmitted between all involved systems.
+
+| Usability
+| The application automates routine tasks and provides clear error messages when issues occur.
+
+| Transparency
+| Tutors can see how each grade was derived, including which CS50 result led to which Moodle grade, via logs or explanations.
+
+| Consistency
+| Repeated imports and exports with identical input data always produce the same grading results and Moodle output.
+
+| Scalability
+| The system can handle growing numbers of students and assignments without noticeable slowdown.
+
+| Correctness
+| CS50 results must map exactly to Moodle grades.
+|===
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -56,6 +87,36 @@ endif::arc42help[]
 
 
 === Quality Scenarios
+
+==== Correctness
+
+* When CS50 submission data is imported, the system maps results exactly to the corresponding Moodle grading schema.
+* If submission data is incomplete or invalid, the system rejects the data and does not generate grades.
+
+==== Reliability
+
+* If an export to Moodle fails, grading data remains stored and can be exported again without data loss.
+* In case of partial failures, the system does not persist inconsistent or incomplete results.
+
+==== Performance
+
+* Importing and grading submissions for a standard course completes within a few seconds.
+* The system remains responsive during batch operations.
+
+==== Security
+
+* Credentials for CS50, Moodle, and GitHub are never exposed via API responses or logs.
+* All communication with external systems is performed over HTTPS.
+
+==== Usability
+
+* A tutor can complete common workflows such as student import and grading without manual intermediate steps.
+* Validation errors are returned with clear and understandable messages.
+
+==== Maintainability
+
+* New CS50 courses can be added without modifying existing grading logic.
+* Changes to external APIs are isolated within integration components.
 
 ifdef::arc42help[]
 [role="arc42help"]
