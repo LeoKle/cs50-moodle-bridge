@@ -3,6 +3,7 @@ ifndef::imagesdir[:imagesdir: ../images]
 [[section-solution-strategy]]
 == Solution Strategy
 
+Implementing a full stack application which automates grading and mitigates disadvantages of Moodle such as poor possibilities to display an good overview over courses, students and exercises. 
 
 ifdef::arc42help[]
 [role="arc42help"]
@@ -32,3 +33,33 @@ See https://docs.arc42.org/section-4/[Solution Strategy] in the arc42 documentat
 
 ****
 endif::arc42help[]
+
+=== Overall Strategy
+
+The system follows a layered architecture:
+
+* API layer for HTTP communication
+* Application logic layer for grading and data processing
+* Integration layer for external systems (GitHub)
+* Persistence layer for storing submissions and results
+
+=== Communication Strategy
+
+All communication is performed via REST-based HTTP APIs.
+
+* CS50 data is imported via file upload
+* Moodle is updated by exporting structured grading data and uploading it to our application
+* The backend exposes JSON-based endpoints for the web UI
+
+=== Integration Strategy
+
+External systems are accessed through dedicated adapter components.
+
+* GitHub integration resolves student GitHub ID
+
+=== Persistence Strategy
+
+Submissions and grading results are stored using a repository abstraction.
+
+* Domain logic depends only on repository interfaces
+* The concrete database technology can be changed without affecting business logic

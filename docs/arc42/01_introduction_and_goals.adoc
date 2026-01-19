@@ -17,7 +17,7 @@ These include
 ****
 endif::arc42help[]
 
-The application acts as a bridge between the CS50 system and Moodle.
+The application acts as a bridge between the CS50 system and Moodle. Its focus is on automating tasks and providing a better user interface than underlying or previously used systems.
 
 === Requirements Overview
 
@@ -82,29 +82,24 @@ endif::arc42help[]
 |===
 |Quality Goal|Scenario
 
-|Reliability
-|The bridge consistently synchronizes data between CS50 and Moodle without data loss
-
-|Performance
-|Synchronization operations complete within acceptable timeframes (< 5 seconds per operation)
-
 |Maintainability
-|Code is well-documented and structured for future enhancements by development teams
-
-|Security
-|User credentials and course data are encrypted and securely transmitted between systems
-
-|Usability
-|The application automatically performs routine tasks and returns error messages when issues appear
-
-|Transparency
-|Tutors can see how each grade was derived (e.g. which CS50 result led to which Moodle grade) via clear logs or explanations
+|Code is well-documented and structured for future enhancements
 
 |Consistency
 |Repeated imports and exports with the same input data always produce the same grading results and Moodle output files
 
-|Scalability
-|The system can handle growing numbers of students and assignments (e.g. several hundred students per course) without noticeable slowdown
+// |Usability
+// |The application automatically performs routine tasks and returns error messages when issues appear
+
+|Transparency
+|Tutors can see how each grade was derived (e.g. which CS50 result led to which Moodle grade) via clear logs or explanations
+
+// |Reliability
+// |The bridge consistently synchronizes data between CS50 and Moodle without data loss
+
+// |Security
+// |User credentials and course data are encrypted and securely transmitted between systems
+
 |===
 
 === Stakeholders
